@@ -287,25 +287,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawNightBackground(Graphics g) {
-        if (nightBackgroundImage != null) {
-            // Tile the image to fill the entire background
-            tileBackgroundImage(g, nightBackgroundImage);
-        } else {
-            // Fallback to original night background if image not loaded
-            drawNightBackgroundFallback(g);
-        }
+        // Draw starry night sky
+        g.setColor(new Color(25, 35, 65)); // Dark blue night sky
+        g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+        drawStars(g);
         
-        // Draw ground/grass
-        g.setColor(new Color(20, 100, 50)); // Darker green for night
-        g.fillRect(0, GROUND_Y - 80, WIDTH, HEIGHT - (GROUND_Y - 80));
+        if (nightBackgroundImage != null) {
+            // Tile the tree image on the platform only
+            tilePlatformImage(g, nightBackgroundImage);
+        } else {
+            // Fallback: Draw solid ground
+            g.setColor(new Color(20, 100, 50)); // Darker green for night
+            g.fillRect(0, GROUND_Y - 80, WIDTH, HEIGHT - (GROUND_Y - 80));
+        }
         
         // Draw ground line
         g.setColor(new Color(0, 70, 0));
         g.fillRect(0, GROUND_Y - 80, WIDTH, 10);
-        
-        // Draw soil/dirt
-        g.setColor(new Color(80, 50, 10));
-        g.fillRect(0, GROUND_Y - 70, WIDTH, 70);
     }
     
     private void tileBackgroundImage(Graphics g, BufferedImage img) {
@@ -323,15 +321,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
     
-    private void drawNightBackgroundFallback(Graphics g) {
-        // Draw night sky
-        g.setColor(new Color(25, 35, 65)); // Dark blue night sky
-        g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+    private void tilePlatformImage(Graphics g, BufferedImage img) {
+        int imgWidth = img.getWidth();
+        int imgHeight = img.getHeight();
+        int platformStartY = GROUND_Y - 80;
+        int platformHeight = HEIGHT - platformStartY;
         
-        // Draw stars
-        drawStars(g);
+        // Calculate starting position based on background offset for horizontal scrolling
+        int offsetX = backgroundOffset % imgWidth;
+        
+        // Tile horizontally and vertically on the platform area only without gaps
+        for (int y = platformStartY; y < HEIGHT; y += imgHeight) {
+            for (int x = -offsetX; x < WIDTH; x += imgWidth) {
+                g.drawImage(img, x, y, imgWidth, imgHeight, null);
+            }
+        }
     }
-
+    
     private void drawStars(Graphics g) {
         g.setColor(Color.WHITE);
         
