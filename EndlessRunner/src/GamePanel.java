@@ -20,6 +20,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private boolean gameOver;
     private Color skyColor;
     private Color grassColor;
+    private int backgroundOffset = 0;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -33,6 +34,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         obstacleSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         gameOver = false;
+        backgroundOffset = 0;
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
 
@@ -144,6 +146,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             // Update scoreboard
             scoreboard.update();
 
+            // Update background offset for parallax scrolling
+            backgroundOffset += currentSpeed;
+            // Keep offset within bounds to prevent overflow
+            if (backgroundOffset > 3200) {
+                backgroundOffset -= 3200;
+            }
+
             // Update sky based on score
             updateSkyColor();
 
@@ -157,18 +166,30 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private void drawClouds(Graphics g) {
         g.setColor(new Color(255, 255, 255, 220)); // White clouds with slight transparency
         
-        // Cloud 1 - Left side
-        drawCloud(g, 100, 80, 80, 40);
+        // Define cloud patterns that repeat
+        int[] cloudX = {100, 300, 420, 600, 700};
+        int[] cloudY = {80, 160, 120, 140, 100};
+        int[] cloudW = {80, 50, 100, 70, 90};
+        int[] cloudH = {40, 25, 45, 35, 42};
         
-        // Cloud 2 - Center
-        drawCloud(g, 420, 120, 100, 45);
-        
-        // Cloud 3 - Right side
-        drawCloud(g, 700, 100, 90, 42);
-        
-        // Additional small clouds
-        drawCloud(g, 300, 160, 50, 25);
-        drawCloud(g, 600, 140, 70, 35);
+        // Draw clouds with parallax scrolling and wrapping
+        for (int i = 0; i < cloudX.length; i++) {
+            int scrolledX = (cloudX[i] - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            
+            // Draw current position
+            drawCloud(g, scrolledX, cloudY[i], cloudW[i], cloudH[i]);
+            
+            // Draw wrapped version if needed
+            if (scrolledX + cloudW[i] < WIDTH) {
+                int wrappedX = scrolledX + 3200;
+                if (wrappedX < WIDTH) {
+                    drawCloud(g, wrappedX, cloudY[i], cloudW[i], cloudH[i]);
+                }
+            }
+        }
     }
 
     private void drawCloud(Graphics g, int x, int y, int width, int height) {
@@ -179,14 +200,28 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawBushes(Graphics g) {
-        // Bush 1 - Left side
-        drawBush(g, 150, GROUND_Y - 90);
+        // Define bush positions that repeat
+        int[] bushX = {150, 450, 700};
+        int[] bushY = {GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95};
         
-        // Bush 2 - Center
-        drawBush(g, 450, GROUND_Y - 85);
-        
-        // Bush 3 - Right side
-        drawBush(g, 700, GROUND_Y - 95);
+        // Draw bushes with parallax scrolling and wrapping
+        for (int i = 0; i < bushX.length; i++) {
+            int scrolledX = (bushX[i] - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            
+            // Draw current position
+            drawBush(g, scrolledX, bushY[i]);
+            
+            // Draw wrapped version if needed
+            if (scrolledX + 80 < WIDTH) {
+                int wrappedX = scrolledX + 3200;
+                if (wrappedX < WIDTH) {
+                    drawBush(g, wrappedX, bushY[i]);
+                }
+            }
+        }
     }
 
     private void drawBush(Graphics g, int x, int y) {
@@ -201,14 +236,33 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void updateSkyColor() {
         int score = scoreboard.getScore();
-        if (score >= 100) {
-            // Transition from light blue to dark blue
-            int progress = Math.min((score - 100) / 100, 1); // 0 to 1 over 100 points
+        
+        if (score < 100) {
+            // Day: Light blue sky
+            skyColor = new Color(135, 206, 235);
+        } else if (score < 500) {
+            // Transition from light blue to dark blue (100-499)
+            float progress = Math.min((score - 100) / 400.0f, 1.0f); // 0 to 1 over 400 points
             int r = (int) (135 * (1 - progress * 0.7));
             int gb = (int) (206 * (1 - progress * 0.8));
             skyColor = new Color(r, gb, gb);
         } else {
-            skyColor = new Color(135, 206, 235); // Light blue
+            // Loop the cycle after score 500
+            int cycleScore = (score - 500) % 400; // Repeats every 400 points
+            
+            if (cycleScore < 200) {
+                // First half: transition from day to night
+                float progress = cycleScore / 200.0f;
+                int r = (int) (135 * (1 - progress * 0.7));
+                int gb = (int) (206 * (1 - progress * 0.8));
+                skyColor = new Color(r, gb, gb);
+            } else {
+                // Second half: transition from night back to day
+                float progress = (cycleScore - 200) / 200.0f;
+                int r = (int) (135 * (1 - (1 - progress) * 0.7));
+                int gb = (int) (206 * (1 - (1 - progress) * 0.8));
+                skyColor = new Color(r, gb, gb);
+            }
         }
     }
 
@@ -241,6 +295,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         obstacles.clear();
         obstacleSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
+        backgroundOffset = 0;
         gameOver = false;
         skyColor = new Color(135, 206, 235);
         repaint();
