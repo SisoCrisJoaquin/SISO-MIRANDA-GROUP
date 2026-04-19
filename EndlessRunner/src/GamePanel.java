@@ -52,7 +52,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     
     private void loadNightBackgroundImage() {
         try {
-            File imageFile = new File("../assets/fir-tree-illustration-of-a-tall-green-pine-tree-tc8euhFV_t.jpg");
+            File imageFile = new File("../assets/—Pngtree—spruce tree pixel art vector_17421473.png");
             if (imageFile.exists()) {
                 nightBackgroundImage = ImageIO.read(imageFile);
                 System.out.println("Night background image loaded successfully!");
