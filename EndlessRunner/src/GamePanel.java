@@ -51,13 +51,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             g.setColor(skyColor);
             g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
 
+            // Draw clouds
+            drawClouds(g);
+
             // Draw ground/grass
             g.setColor(grassColor);
             g.fillRect(0, GROUND_Y - 80, WIDTH, HEIGHT - (GROUND_Y - 80));
 
-            // Draw ground line
+            // Draw bushes on the grass
+            drawBushes(g);
+
+            // Draw ground line (darker green)
             g.setColor(new Color(0, 100, 0));
             g.fillRect(0, GROUND_Y - 80, WIDTH, 10);
+
+            // Draw soil/dirt
+            g.setColor(new Color(139, 69, 19));
+            g.fillRect(0, GROUND_Y - 70, WIDTH, 70);
 
             // Draw player
             player.draw(g);
@@ -142,6 +152,51 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             repaint();
         }
+    }
+
+    private void drawClouds(Graphics g) {
+        g.setColor(new Color(255, 255, 255, 220)); // White clouds with slight transparency
+        
+        // Cloud 1 - Left side
+        drawCloud(g, 100, 80, 80, 40);
+        
+        // Cloud 2 - Center
+        drawCloud(g, 420, 120, 100, 45);
+        
+        // Cloud 3 - Right side
+        drawCloud(g, 700, 100, 90, 42);
+        
+        // Additional small clouds
+        drawCloud(g, 300, 160, 50, 25);
+        drawCloud(g, 600, 140, 70, 35);
+    }
+
+    private void drawCloud(Graphics g, int x, int y, int width, int height) {
+        // Draw cloud using circles to create a fluffy effect
+        g.fillOval(x, y, width / 3, height);
+        g.fillOval(x + width / 4, y - height / 3, width / 2, height);
+        g.fillOval(x + width / 2, y, width / 3, height);
+    }
+
+    private void drawBushes(Graphics g) {
+        // Bush 1 - Left side
+        drawBush(g, 150, GROUND_Y - 90);
+        
+        // Bush 2 - Center
+        drawBush(g, 450, GROUND_Y - 85);
+        
+        // Bush 3 - Right side
+        drawBush(g, 700, GROUND_Y - 95);
+    }
+
+    private void drawBush(Graphics g, int x, int y) {
+        // Draw bush as grouped circles (shrub effect)
+        g.setColor(new Color(34, 150, 34)); // Darker green
+        
+        // Main bush body
+        g.fillOval(x, y, 80, 60);
+        g.fillOval(x + 20, y - 30, 70, 70);
+        g.fillOval(x - 15, y - 10, 70, 60);
     }
 
     private void updateSkyColor() {
