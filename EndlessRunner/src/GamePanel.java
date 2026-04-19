@@ -245,46 +245,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private boolean isNightTime() {
         int score = scoreboard.getScore();
-        
-        if (score < 100) {
-            return false; // Day
-        } else if (score < 500) {
-            return true; // Transitioning to night and full night
-        } else {
-            int cycleScore = (score - 500) % 400;
-            return cycleScore < 200; // First half of cycle is night
-        }
+        int cycleScore = score % 1000; // Cycle every 1000 points
+        return cycleScore >= 500; // Night is second half of cycle (500-999)
     }
 
     private void updateSkyColor() {
         int score = scoreboard.getScore();
+        int cycleScore = score % 1000; // Cycle every 1000 points
         
-        if (score < 100) {
+        if (cycleScore < 500) {
             // Day: Light blue sky
             skyColor = new Color(135, 206, 235);
-        } else if (score < 500) {
-            // Transition from light blue to dark blue (100-499)
-            float progress = Math.min((score - 100) / 400.0f, 1.0f);
-            int r = (int) (135 * (1 - progress * 0.7));
-            int gb = (int) (206 * (1 - progress * 0.8));
-            skyColor = new Color(r, gb, gb);
         } else {
-            // Loop the cycle after score 500
-            int cycleScore = (score - 500) % 400;
-            
-            if (cycleScore < 200) {
-                // First half: transition from day to night
-                float progress = cycleScore / 200.0f;
-                int r = (int) (135 * (1 - progress * 0.7));
-                int gb = (int) (206 * (1 - progress * 0.8));
-                skyColor = new Color(r, gb, gb);
-            } else {
-                // Second half: transition from night back to day
-                float progress = (cycleScore - 200) / 200.0f;
-                int r = (int) (135 * (1 - (1 - progress) * 0.7));
-                int gb = (int) (206 * (1 - (1 - progress) * 0.8));
-                skyColor = new Color(r, gb, gb);
-            }
+            // Night: Dark blue sky
+            skyColor = new Color(25, 35, 65);
         }
     }
 
