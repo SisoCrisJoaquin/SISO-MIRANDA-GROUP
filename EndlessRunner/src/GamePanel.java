@@ -1,6 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
 
@@ -21,6 +25,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private Color skyColor;
     private Color grassColor;
     private int backgroundOffset = 0;
+    private BufferedImage nightBackgroundImage;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -37,9 +42,27 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         backgroundOffset = 0;
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
+        
+        // Load night background image
+        loadNightBackgroundImage();
 
         gameTimer = new javax.swing.Timer(30, this);
         gameTimer.start();
+    }
+    
+    private void loadNightBackgroundImage() {
+        try {
+            File imageFile = new File("assets/night_tree.png");
+            if (imageFile.exists()) {
+                nightBackgroundImage = ImageIO.read(imageFile);
+            } else {
+                System.out.println("Night background image not found at: " + imageFile.getAbsolutePath());
+                nightBackgroundImage = null;
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading night background image: " + e.getMessage());
+            nightBackgroundImage = null;
+        }
     }
 
     @Override
@@ -263,15 +286,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawNightBackground(Graphics g) {
-        // Draw night sky
-        g.setColor(new Color(25, 35, 65)); // Dark blue night sky
-        g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
-        
-        // Draw stars
-        drawStars(g);
-        
-        // Draw night forest
-        drawNightForest(g);
+        if (nightBackgroundImage != null) {
+            // Tile the image to fill the entire background
+            tileBackgroundImage(g, nightBackgroundImage);
+        } else {
+            // Fallback to original night background if image not loaded
+            drawNightBackgroundFallback(g);
+        }
         
         // Draw ground/grass
         g.setColor(new Color(20, 100, 50)); // Darker green for night
@@ -284,6 +305,30 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         // Draw soil/dirt
         g.setColor(new Color(80, 50, 10));
         g.fillRect(0, GROUND_Y - 70, WIDTH, 70);
+    }
+    
+    private void tileBackgroundImage(Graphics g, BufferedImage img) {
+        int imgWidth = img.getWidth();
+        int imgHeight = img.getHeight();
+        
+        // Calculate starting position based on background offset
+        int offsetX = backgroundOffset % imgWidth;
+        
+        // Tile horizontally and vertically to fill entire screen without gaps
+        for (int y = 0; y < HEIGHT; y += imgHeight) {
+            for (int x = -offsetX; x < WIDTH; x += imgWidth) {
+                g.drawImage(img, x, y, imgWidth, imgHeight, null);
+            }
+        }
+    }
+    
+    private void drawNightBackgroundFallback(Graphics g) {
+        // Draw night sky
+        g.setColor(new Color(25, 35, 65)); // Dark blue night sky
+        g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+        
+        // Draw stars
+        drawStars(g);
     }
 
     private void drawStars(Graphics g) {
