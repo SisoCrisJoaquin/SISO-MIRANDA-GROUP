@@ -32,9 +32,18 @@ A fun and addictive endless runner game built in pure Java using Swing!
 
 ## Compilation & Running
 
-### Option 1: Using Batch Script (Windows)
+### ⚡ Quick Start (Recommended - Windows)
 ```
-run.bat
+1. Double-click build.bat      (compiles the game)
+2. Double-click play.bat       (runs the game)
+```
+That's it! The game will start immediately.
+
+### Option 1: Using Batch Script
+```bash
+cd EndlessRunner
+build.bat
+play.bat
 ```
 
 ### Option 2: Manual Compilation
@@ -43,12 +52,14 @@ run.bat
 cd src
 javac *.java
 cd ..
+java -cp bin Main
 ```
 
-### Option 3: Manual Running (after compilation)
+### Option 3: Command Line
 ```bash
-cd bin
-java -cp ../src Main
+cd EndlessRunner
+javac -d bin src/*.java
+java -cp bin Main
 ```
 
 ## Game Structure
@@ -111,7 +122,30 @@ java -cp ../src Main
 4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
 5. **Watch the Sky** - When it darkens, you've reached score 100! Keep going!
 
+## Build System
+
+### Build Scripts (Windows)
+- **build.bat** - Compiles all Java source files to the `bin/` folder
+  - Creates necessary directories automatically
+  - Shows "Build Complete!" when done
+  - Run this first before playing
+  
+- **play.bat** - Launches the game from compiled classes in `bin/` folder
+  - Automatically finds and runs the game
+  - Handles all the Java commands for you
+  - Just double-click and play!
+
+### build.ps1 (PowerShell alternative)
+- Advanced build script for users who prefer PowerShell
+- Provides better error handling and colored output
+
 ## Recent Updates
+
+### Version 2.1 - Simplified Build System
+- 🔨 **build.bat**: Simple double-click compilation
+- ▶️ **play.bat**: Simple double-click to launch the game
+- 🎨 **Smooth Transitions**: Day/night color transitions instead of abrupt changes
+- ⚡ **Quick Start**: Just 2 clicks to build and play!
 
 ### Version 2.0 - Menu & Pause System
 - ✨ **Main Menu**: Beautiful start screen with game instructions and controls display
