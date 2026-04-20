@@ -350,13 +350,35 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         int score = scoreboard.getScore();
         int cycleScore = score % 1000; // Cycle every 1000 points
         
-        if (cycleScore < 500) {
-            // Day: Light blue sky
-            skyColor = new Color(135, 206, 235);
+        // Day color: Light blue
+        Color dayColor = new Color(135, 206, 235);
+        // Night color: Dark blue
+        Color nightColor = new Color(25, 35, 65);
+        
+        // Smooth transition zones
+        if (cycleScore < 450) {
+            // Full day
+            skyColor = dayColor;
+        } else if (cycleScore < 550) {
+            // Transition from day to night (450-550)
+            float transition = (cycleScore - 450) / 100f;
+            skyColor = blendColors(dayColor, nightColor, transition);
+        } else if (cycleScore < 950) {
+            // Full night
+            skyColor = nightColor;
         } else {
-            // Night: Dark blue sky
-            skyColor = new Color(25, 35, 65);
+            // Transition from night to day (950-1000)
+            float transition = (cycleScore - 950) / 50f;
+            skyColor = blendColors(nightColor, dayColor, transition);
         }
+    }
+
+    private Color blendColors(Color color1, Color color2, float progress) {
+        // progress: 0.0 = color1, 1.0 = color2
+        int r = (int) (color1.getRed() * (1 - progress) + color2.getRed() * progress);
+        int g = (int) (color1.getGreen() * (1 - progress) + color2.getGreen() * progress);
+        int b = (int) (color1.getBlue() * (1 - progress) + color2.getBlue() * progress);
+        return new Color(r, g, b);
     }
 
     private void drawNightBackground(Graphics g) {
