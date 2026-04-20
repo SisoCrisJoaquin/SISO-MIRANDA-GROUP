@@ -2,24 +2,13 @@
 ║                   ✅ ENDLESS RUNNER GAME - READY TO PLAY!                  ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
-🎯 WHAT YOU ASKED FOR:
-   ✓ Make the game into an .jar application
-   ✓ Implement code for custom images (player, obstacles, background)
-
-🎉 WHAT YOU GOT:
-   ✓ Complete image support system
-   ✓ Automated JAR build system  
-   ✓ Professional game application
-   ✓ Comprehensive documentation
-   ✓ Ready to distribute!
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🚀 START HERE - 3 SIMPLE STEPS:
 
    STEP 1: Build
    ────────────
-   Location: C:\Users\John Paul\Downloads\Endless runner game\SISO-MIRANDA-GROUP\EndlessRunner
+   Location: Navigate to the EndlessRunner folder in your project
    Action:   Double-click run.bat
    Result:   Creates EndlessRunner.jar (your game!)
    
