@@ -1,103 +1,192 @@
-# SISO-MIRANDA-GROUP
+# SISO-MIRANDA-GROUP - Endless Runner Game
 
-## Endless Runner Game
+A fun and addictive endless runner game built in pure Java using Swing! Features dynamic day/night transitions, smooth gameplay, and engaging mechanics.
 
-A feature-rich endless runner game built in Java with Swing, offering dynamic day/night cycles, detailed graphics, and engaging gameplay mechanics.
+## 🎮 Features
 
-### Features
+✅ **Smooth Day/Night Transitions** - Beautiful continuous color blending every 1000 points  
+✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
+✅ **Pause Menu** - Press P to pause and see your score and lives  
+✅ **Player with 3 Lives** - Lose all lives and it's game over  
+✅ **Grassy Field Platform** - Run on a beautiful green field  
+✅ **Detailed Obstacles** - Avoid rocks and obstacles with realistic 3D effects  
+✅ **Dynamic Scoreboard** - Track your score and remaining lives in real-time  
+✅ **Collision Detection** - Precise collision detection with obstacles  
+✅ **Game Over Screen** - Restart or quit when you run out of lives  
+✅ **Increasing Difficulty** - Game speeds up as your score increases  
+✅ **Custom Graphics Support** - Add your own PNG images for player, obstacles, and backgrounds
+✅ **Parallax Scrolling** - Background elements with depth perception  
+✅ **Seamless Wrapping** - Smooth infinite scrolling backgrounds
 
-#### Gameplay Mechanics
-- **3 Lives System**: Players start with 3 lives and lose one upon collision with obstacles
-- **Score System**: Continuous score tracking as the player progresses
-- **Game Over Screen**: Displays final score with restart and quit options
-- **Collision Detection**: Precise collision detection with obstacles
+## 🎮 How to Play
 
-#### Day/Night Cycle
-- **Score-Based Cycling**: Every 1000 points completes one full cycle
-  - **Day Mode**: 0-499 points
-  - **Night Mode**: 500-999 points
-- **Smooth Transitions**: Dynamic sky color changes during transitions
-- **Continuous Looping**: Cycle repeats infinitely throughout gameplay
+### Controls
+- **SPACEBAR** - Jump over obstacles / Start game from menu
+- **P** - Pause/Unpause game during gameplay
+- **R** - Restart game (when game over)
+- **Q** - Quit to menu (when paused) or quit game (when game over)
 
-#### Day Cycle Background
-- **Sky**: Light blue sky with gradient effect
-- **Clouds**: Detailed fluffy clouds with shadow layers for depth, positioned at various heights
-- **Flags**: Colorful flags with long wooden poles reaching to the platform
-  - 8 Different flag colors: Red, Blue, Yellow, Green, Orange, Purple, Pink, Cyan
-  - Flags positioned far in the background creating depth perception
-- **Railings**: Continuous gray railings with horizontal rails and vertical posts
-  - No cut-off lines, seamless scrolling
-  - Professional track-like appearance
+### Objective
+- Run as far as possible without hitting obstacles
+- Each frame you survive increases your score by 1
+- Avoid obstacles to keep your 3 lives
+- Score reaches different zones every 1000 points with smooth day/night transitions!
 
-#### Night Cycle Background
-- **Starry Sky**: Deterministic starfield with 50 white stars that parallax scroll
-- **Pine Trees**: Varied forest with trees of different sizes creating depth
-  - Tree sizes range from 0.7x to 1.6x scale
-  - Larger trees appear closer, smaller trees appear farther
-  - Shadow shading for 3D dimension effect
+### Tips for Playing
+1. **Timing is Key** - Jump early to clear obstacles safely
+2. **Watch the Pattern** - Obstacles spawn at intervals, learn the rhythm
+3. **Stay Centered** - The player automatically moves back to starting position
+4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
+5. **Watch the Sky** - Enjoy the smooth transitions between day and night!
 
-#### Detailed Platform
-- **Road Track Design**: 
-  - Day mode: Brown road with texture
-  - Night mode: Dark asphalt road
-- **Center Line Markings**: Yellow dashed lines across the road (day) / light markings (night)
-- **Road Edges**: Darker shading on top and bottom edges
-- **Pebbles & Texture**: Random stones scattered across the road for visual detail
+## 📁 Project Structure
+
+```
+SISO-MIRANDA-GROUP/
+│
+├── README.md                    (Main documentation)
+├── START_HERE.txt              (Quick start guide)
+│
+└── EndlessRunner/              (Game folder)
+    │
+    ├── README.md               (Game-specific docs)
+    ├── build.bat               (Build script - double-click to compile)
+    ├── play.bat                (Play script - double-click to run)
+    ├── build.ps1               (PowerShell build script)
+    │
+    ├── src/                    (Java source code)
+    │   ├── Main.java           (Entry point, window management)
+    │   ├── MenuPanel.java      (Main menu screen)
+    │   ├── GamePanel.java      (Main game loop & rendering)
+    │   ├── Player.java         (Player character & jumping)
+    │   ├── Obstacle.java       (Obstacle spawning & collision)
+    │   ├── Scoreboard.java     (Score & lives tracking)
+    │   └── ImageLoader.java    (Custom image support)
+    │
+    ├── bin/                    (Compiled Java classes)
+    │   └── *.class
+    │
+    └── resources/              (Custom images folder - optional)
+        ├── player.png          (Custom player image)
+        ├── obstacle.png        (Custom obstacle image)
+        └── background.png      (Custom background image)
+```
+
+## ⚡ Quick Start
+
+### Windows (Easiest)
+```
+1. Go to EndlessRunner folder
+2. Double-click build.bat      (compiles the game)
+3. Double-click play.bat       (runs the game)
+Done! The game will start immediately.
+```
+
+### From Command Line
+```bash
+# Option 1: From src folder
+cd EndlessRunner/src
+javac *.java
+java Main
+
+# Option 2: From EndlessRunner folder
+cd EndlessRunner
+javac -d bin src/*.java
+java -cp bin Main
+
+# Option 3: Using batch scripts
+cd EndlessRunner
+build.bat
+play.bat
+```
+
+## 🏗️ Game Architecture
+
+### Java Source Files
+- **MAIN.JAVA** - Entry point, creates window and manages menu/game switching
+- **MENUPANEL.JAVA** - Main menu screen with game title and controls display
+- **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, and smooth transitions
+- **PLAYER.JAVA** - Player character with jump mechanics and gravity
+- **OBSTACLE.JAVA** - Obstacle spawning and collision detection
+- **SCOREBOARD.JAVA** - Score tracking and life management system
+- **IMAGELOADER.JAVA** - Custom image loading from resources folder
+
+### Game Mechanics
+
+#### Player
+- Starts on the left side of the platform
+- Jumps with SPACEBAR
+- Gravity pulls back down to platform
+- Resets position when hitting an obstacle
 
 #### Obstacles
-- **Rock & Boulder Obstacles**: Replaced spikes with detailed rocks
-  - Multi-layered boulder design with stacked smaller rocks
-  - Gray coloring with shadow and highlight effects for 3D appearance
-  - Small pebbles clustered around main boulder
-  - Crack texture details for realism
+- Randomly spawn from right side
+- Move left at increasing speeds
+- Remove when off-screen
 
-#### Graphics
-- **Parallax Scrolling**: Background elements scroll at different speeds
-  - Clouds and trees scroll slower than the player
-  - Creates depth perception and immersion
-- **Antialiasing**: Smooth rendering of all graphics
-- **Color Variety**: Rich color palette with detailed shading
-- **Seamless Wrapping**: All background elements wrap seamlessly every 3200 pixels
+#### Scoring System
+- Score increases by 1 each frame (30 FPS)
+- Score resets when hitting obstacle
+- Speed increases with score
 
-### Game Controls
-- **Arrow Keys / A/D**: Move left and right
-- **Space / W**: Jump
-- **Restart/Quit**: Available from game over screen
+#### Lives System
+- Player starts with 3 lives
+- Lose 1 life per collision
+- Game over when lives = 0
 
-### Technical Details
-- **Language**: Java
-- **Graphics**: Java Swing (Graphics2D)
-- **Resolution**: 800x600 pixels
-- **Frame Rate**: 30 FPS
-- **Platform Base**: Y-coordinate at 520 (GROUND_Y = 500)
+#### Day/Night Cycle (Every 1000 Points)
+- **0-400 points**: Full day (light blue sky)
+- **400-600 points**: Smooth day→night transition
+- **600-900 points**: Full night (dark sky with stars)
+- **900-1000 points**: Smooth night→day transition
+- Repeats infinitely
 
-### File Structure
-```
-EndlessRunner/
-├── src/
-│   ├── GamePanel.java      (Main game logic and rendering)
-│   ├── Main.java           (Window initialization)
-│   ├── Player.java         (Player character mechanics)
-│   ├── Obstacle.java       (Obstacle/boulder rendering)
-│   ├── Scoreboard.java     (Score and lives tracking)
-│   └── run.bat             (Launch script)
-└── README.md
-```
+#### User Interface
+- **Main Menu**: Shows at startup with controls and title
+- **Pause Menu**: Press P to pause, shows score and lives
+- **Game Over Screen**: Shows final score, press R to restart or Q to quit
 
-### How to Run
-1. Navigate to the `EndlessRunner` directory
-2. Run `run.bat` to compile and start the game
-3. Or manually compile with: `javac src/*.java` and run with: `java -cp src Main`
+## 📝 Build System
 
-### Gameplay Tips
-- Master the timing of jumps to avoid rocks
-- Watch for the score milestones - the environment changes at 500 points
-- The night cycle brings trees closer to the foreground
-- Railings mark the safe running area boundaries
+### Build Scripts (Windows)
+- **build.bat** - Compiles all Java source files to the `bin/` folder
+  - Creates necessary directories automatically
+  - Shows "Build Complete!" when done
+  
+- **play.bat** - Launches the game from compiled classes in `bin/` folder
+  - Automatically finds and runs the game
+  - Just double-click and play!
 
-### Version History
-- **Latest Update**: Enhanced visual details with varied tree sizes, detailed platform design, realistic rock obstacles, and continuous railings. Replaced bushes with colorful flags and improved background depth perception.
+- **build.ps1** - PowerShell build script with better error handling
+
+## 🚀 Recent Updates
+
+### Version 2.2 - Bug Fixes & Code Quality
+- 🐛 **Fixed Smooth Transitions**: Eliminated abrupt day/night switching - now perfectly smooth
+  - Extended transition zones (400-600 & 900-1000 point ranges)
+  - Seamless color blending throughout entire cycle
+- 📖 **Code Headers**: All Java files now have clear file names and descriptions for easy navigation
+- 🎮 **Multiple Run Options**: Game now runs from both `src/` and `EndlessRunner/` folders
+- ✨ **Better Readability**: Clear file structure with organized class descriptions
+
+### Version 2.1 - Simplified Build System
+- 🔨 **build.bat**: Simple double-click compilation to `bin/` folder
+- ▶️ **play.bat**: Simple double-click to launch the game
+- 🎨 **Smooth Transitions**: Day/night color transitions instead of abrupt changes
+- ⚡ **Quick Start**: Just 2 clicks to build and play!
+
+### Version 2.0 - Menu & Pause System
+- ✨ **Main Menu**: Beautiful start screen with game instructions and controls
+- ⏸️ **Pause Menu**: Press P to pause and view current score and lives
+- 🎮 **Enhanced UI**: Cleaner game flow with menu-to-game transitions
+- 📋 **MenuPanel.java**: New class for menu rendering and controls
+- 🔄 **Updated Main.java**: Uses CardLayout for smooth menu/game switching
+
+### Version 1.0 - Initial Release
+- Core game mechanics with 3 lives system
+- Score tracking and increasing difficulty
+- Collision detection and game over screen
 
 ---
 
-*Developed by Siso*
+**Updated by Miranda** 🎮
