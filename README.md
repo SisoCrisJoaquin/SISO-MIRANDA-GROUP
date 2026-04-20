@@ -161,6 +161,101 @@ play.bat
 
 ## 🚀 Recent Updates
 
+### Miranda's Session Updates - Comprehensive Development
+
+#### 🎮 Menu System Implementation
+- **MenuPanel.java** - New class created for main menu screen
+  - Displays game title and welcome message
+  - Shows all available controls (SPACEBAR to start, P to pause, Q to quit)
+  - Implements KeyListener for player input detection
+  - SPACEBAR press triggers game start via Main.java
+
+#### ⏸️ Pause Menu with Score Display
+- Added pause functionality via P key during gameplay
+- Pause menu displays:
+  - Current score
+  - Remaining lives
+  - Instructions to resume (P) or quit (Q)
+- Semi-transparent overlay for better visibility
+- Game loop only updates when NOT paused
+
+#### 🌅 Smooth Day/Night Transitions with Color Blending
+- Implemented linear RGB color interpolation algorithm
+  - Formula: `new_value = old_value * (1 - progress) + target_value * progress`
+- Extended transition zones for seamless changes:
+  - **400-600 points**: Day to Night transition zone (200-point blend)
+  - **600-900 points**: Full night mode (stars and trees visible)
+  - **900-1000 points**: Night to Day transition zone (100-point blend)
+- Color updates happen every frame for smooth visual effect
+
+#### 🐛 Bug Fix: Eliminated Abrupt Transitions
+- **Problem**: Day/night environment switched abruptly mid-transition
+- **Root Cause**: `isNightTime()` threshold didn't align with color transition completion
+- **Solution**: 
+  - Changed `isNightTime()` to return true at score >= 550 (after full color blend completes)
+  - Extended transition zones ensure color blending finishes before environment switches
+  - Result: Perfectly smooth transitions with no visual jarring
+
+#### 🔨 Simplified Build System
+- **build.bat** - Created simple compilation script
+  - Automatically creates `bin/` directory
+  - Compiles all `.java` files from `src/` folder
+  - Displays success message when complete
+  - No external jar dependencies needed
+  
+- **play.bat** - Created simple execution script
+  - Runs compiled game from `bin/` folder using `java -cp bin Main`
+  - Just double-click to play!
+  - No complex Java commands needed
+
+- **build.ps1** - PowerShell alternative for advanced users
+  - Enhanced error handling and feedback
+  - Color-coded output for better readability
+  - Cross-platform compatibility
+
+#### 📖 Code Documentation & File Headers
+- Added clear file headers to all Java classes:
+  - `Main.java` - Application entry point and window management
+  - `MenuPanel.java` - Main menu screen and controls
+  - `GamePanel.java` - Core game loop and rendering engine
+  - `Player.java` - Player character with jump mechanics
+  - `Obstacle.java` - Obstacle spawning and collision detection
+  - `Scoreboard.java` - Score and lives tracking
+  - `ImageLoader.java` - Custom image loading with fallback support
+- Each header clearly states file purpose and key features
+
+#### 🎮 Multiple Run Options Verified
+- Tested and confirmed game runs from three different methods:
+  1. **From src folder**: `cd EndlessRunner/src; javac *.java; java Main`
+  2. **From EndlessRunner folder**: `javac -d bin src/*.java; java -cp bin Main`
+  3. **Via batch scripts**: `build.bat` then `play.bat`
+- All methods validated and working perfectly
+
+#### 📚 Documentation Consolidation
+- **Root README.md** - Completely reorganized and expanded
+  - Consolidated with EndlessRunner/README.md content
+  - Added comprehensive project structure with both root and game folders
+  - Included all run options and build methods
+  - Professional formatting with emoji section markers
+  
+- **START_HERE.txt** - Updated with generic file paths
+  - Removed personal machine-specific file paths
+  - Made guide usable for anyone cloning the repository
+  
+- **EndlessRunner/README.md** - Updated with Version 2.2 documentation
+  - Highlighted smooth transition fixes
+  - Added code quality improvements
+  - Documented multiple run options
+
+#### 🏗️ Code Quality Improvements
+- All Java files compile without errors
+- Clear variable naming and comments
+- Organized class hierarchy with proper inheritance
+- Efficient game loop with 30 FPS consistent performance
+- Proper resource management and cleanup
+
+---
+
 ### Version 2.2 - Bug Fixes & Code Quality
 - 🐛 **Fixed Smooth Transitions**: Eliminated abrupt day/night switching - now perfectly smooth
   - Extended transition zones (400-600 & 900-1000 point ranges)
