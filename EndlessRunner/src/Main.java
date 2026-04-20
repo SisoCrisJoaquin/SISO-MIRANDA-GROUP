@@ -1,6 +1,11 @@
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * ========== MAIN.JAVA ==========
+ * Entry point for the Endless Runner game
+ * Sets up the game window and manages menu/game switching
+ */
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Endless Runner");

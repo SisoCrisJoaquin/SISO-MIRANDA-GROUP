@@ -6,8 +6,10 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 /**
- * Utility class for loading and caching images for the Endless Runner game.
- * Images can be loaded from JAR resources or file system.
+ * ========== IMAGELOADER.JAVA ==========
+ * Utility for loading and caching custom game images
+ * Supports PNG images from resources folder or file system
+ * Gracefully falls back to default graphics if images not found
  */
 public class ImageLoader {
     private static final Map<String, BufferedImage> imageCache = new HashMap<>();

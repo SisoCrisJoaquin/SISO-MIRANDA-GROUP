@@ -1,6 +1,11 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * ========== PLAYER.JAVA ==========
+ * Represents the player character with jump mechanics
+ * Handles gravity, collision bounds, and rendering
+ */
 public class Player {
     private int x;
     private int y;

@@ -5,6 +5,11 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
+/**
+ * ========== GAMEPANEL.JAVA ==========
+ * Main game loop and rendering engine
+ * Handles player input, obstacle spawning, collisions, and smooth day/night transitions
+ */
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
@@ -343,7 +348,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private boolean isNightTime() {
         int score = scoreboard.getScore();
         int cycleScore = score % 1000; // Cycle every 1000 points
-        return cycleScore >= 500; // Night is second half of cycle (500-999)
+        return cycleScore >= 550; // Night starts AFTER transition completes
     }
 
     private void updateSkyColor() {
@@ -355,25 +360,26 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         // Night color: Dark blue
         Color nightColor = new Color(25, 35, 65);
         
-        // Smooth transition zones
-        if (cycleScore < 450) {
-            // Full day
+        // Extended smooth transition zones for better effect
+        if (cycleScore < 400) {
+            // Full day (0-400)
             skyColor = dayColor;
-        } else if (cycleScore < 550) {
-            // Transition from day to night (450-550)
-            float transition = (cycleScore - 450) / 100f;
+        } else if (cycleScore < 600) {
+            // Long transition from day to night (400-600)
+            float transition = (cycleScore - 400) / 200f;
             skyColor = blendColors(dayColor, nightColor, transition);
-        } else if (cycleScore < 950) {
-            // Full night
+        } else if (cycleScore < 900) {
+            // Full night (600-900)
             skyColor = nightColor;
         } else {
-            // Transition from night to day (950-1000)
-            float transition = (cycleScore - 950) / 50f;
+            // Long transition from night to day (900-1000)
+            float transition = (cycleScore - 900) / 100f;
             skyColor = blendColors(nightColor, dayColor, transition);
         }
     }
 
     private Color blendColors(Color color1, Color color2, float progress) {
+        // Smooth color interpolation
         // progress: 0.0 = color1, 1.0 = color2
         int r = (int) (color1.getRed() * (1 - progress) + color2.getRed() * progress);
         int g = (int) (color1.getGreen() * (1 - progress) + color2.getGreen() * progress);

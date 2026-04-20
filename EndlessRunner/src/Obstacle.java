@@ -1,6 +1,11 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * ========== OBSTACLE.JAVA ==========
+ * Represents obstacles that move across the screen
+ * Handles collision detection and rendering
+ */
 public class Obstacle {
     private int x;
     private int y;

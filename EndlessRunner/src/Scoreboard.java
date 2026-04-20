@@ -1,5 +1,10 @@
 import java.awt.*;
 
+/**
+ * ========== SCOREBOARD.JAVA ==========
+ * Tracks score and lives during gameplay
+ * Manages game state and scoring logic
+ */
 public class Scoreboard {
     private int score;
     private int lives;

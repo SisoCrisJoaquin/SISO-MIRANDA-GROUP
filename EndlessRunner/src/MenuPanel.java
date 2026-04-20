@@ -2,6 +2,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+/**
+ * ========== MENUPANEL.JAVA ==========
+ * Main menu screen displayed at game start
+ * Shows game title, instructions, and controls
+ */
 public class MenuPanel extends JPanel implements KeyListener {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
