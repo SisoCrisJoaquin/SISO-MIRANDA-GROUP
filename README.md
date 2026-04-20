@@ -72,9 +72,18 @@ SISO-MIRANDA-GROUP/
         └── background.png      (Custom background image)
 ```
 
+## ⚡ Quick Play
+
+### 🏃 Just Want to Play? (Fastest!)
+If you already have the game compiled:
+```
+Go to EndlessRunner folder and double-click play.bat
+Game starts immediately!
+```
+
 ## ⚡ Quick Start
 
-### Windows (Easiest)
+### Windows (Easiest - First Time Setup)
 ```
 1. Go to EndlessRunner folder
 2. Double-click build.bat      (compiles the game)
