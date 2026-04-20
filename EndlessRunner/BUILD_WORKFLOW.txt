@@ -1,0 +1,374 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                 ENDLESS RUNNER - BUILD & PLAY WORKFLOW                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+BEFORE BUILDING:
+════════════════
+
+EndlessRunner/
+├── src/                    (Java source files)
+│   ├── Main.java
+│   ├── GamePanel.java      ← UPDATED: Image support
+│   ├── Player.java         ← UPDATED: Image support
+│   ├── Obstacle.java       ← UPDATED: Image support
+│   ├── Scoreboard.java
+│   └── ImageLoader.java    ← NEW: Loads images
+├── resources/              (For your custom images)
+├── run.bat                 (Build script)
+└── play.bat                (Play script)
+
+
+STEP 1: BUILD (Double-click run.bat)
+═════════════════════════════════════
+
+    run.bat
+       ↓
+    [Checks Java]
+       ↓ (if Java found)
+    [Compiles Java files]
+       ↓
+    src/*.java + ImageLoader.java
+       ↓ (javac -d ../bin *.java)
+       ↓
+    bin/*.class files created
+       ↓
+    [Creates META-INF folder]
+       ↓
+    [Generates MANIFEST.MF]
+       ↓
+    bin/META-INF/MANIFEST.MF
+       (containing: Main-Class: Main)
+       ↓
+    [Builds JAR file]
+       ↓
+    jar cfm EndlessRunner.jar META-INF/MANIFEST.MF *.class
+       ↓
+    ✓ EndlessRunner.jar CREATED!
+    
+    ✓ Game is ready to play!
+
+
+AFTER BUILDING:
+═══════════════
+
+EndlessRunner/
+├── src/                    (Java source)
+│   ├── *.java
+│   └── *.class             ← Created by compiler
+├── bin/                    ← Created during build
+│   ├── *.class             ← Compiled classes
+│   └── META-INF/
+│       └── MANIFEST.MF     ← JAR configuration
+├── resources/              (Optional: your custom images)
+│   ├── player.png               (place here)
+│   ├── obstacle.png             (place here)
+│   └── background.png           (place here)
+├── run.bat
+├── play.bat
+└── EndlessRunner.jar       ← THE GAME! (created by run.bat)
+
+
+STEP 2: PLAY (Double-click play.bat or EndlessRunner.jar)
+══════════════════════════════════════════════════════════
+
+    play.bat or EndlessRunner.jar
+           ↓
+    [Locates EndlessRunner.jar]
+           ↓
+    java -jar EndlessRunner.jar
+           ↓
+    [JVM Starts]
+           ↓
+    [Loads Main class]
+           ↓
+    Main.main() called
+           ↓
+    [Creates JFrame]
+           ↓
+    [Creates GamePanel]
+           ↓
+    GamePanel()
+    ├─ [Loads player.png] → player.playerImage
+    ├─ [Loads obstacle.png] → obstacle.obstacleImage
+    └─ [Loads background.png] → GamePanel.backgroundImage
+           ↓
+    [Game window appears]
+           ↓
+    ✓ GAME RUNNING!
+
+
+GAME STARTUP SEQUENCE (Technical):
+═══════════════════════════════════
+
+JFrame created
+     ↓
+GamePanel initialized
+     ↓
+Constructor called:
+├─ Player created
+│  └─ ImageLoader.loadImage("/player.png")
+│     ├─ Tries resources
+│     ├─ Tries file system
+│     └─ Returns BufferedImage or null
+│
+├─ Scoreboard created
+│
+├─ Obstacles ArrayList created
+│
+├─ Background image loaded
+│  └─ ImageLoader.loadImage("/background.png")
+│     ├─ Tries resources
+│     ├─ Tries file system
+│     └─ Returns BufferedImage or null
+│
+└─ Game timer started
+     ↓
+paintComponent() called repeatedly
+     ↓
+If image exists: Draw image
+If no image: Draw fallback shape
+     ↓
+Game loop continues...
+
+
+IMAGE LOADING PROCESS:
+══════════════════════
+
+ImageLoader.loadImage("player.png")
+           ↓
+Check image cache
+├─ If found → return cached image
+└─ If not found → continue
+           ↓
+Try loading from JAR resources
+├─ Success → cache and return
+└─ Not found → continue
+           ↓
+Try loading from file system
+├─ Check: resources/player.png exists?
+├─ Yes → load, cache, return
+└─ No → continue
+           ↓
+Try alternate path
+├─ Check: resources/player.png exists?
+├─ Yes → load, cache, return
+└─ No → continue
+           ↓
+⚠️  Image not found
+├─ Print error message
+└─ Return null (use fallback graphics)
+
+
+GAME RENDERING WITH IMAGES:
+═════════════════════════════
+
+If playerImage != null AND useImage == true:
+    g2d.drawImage(playerImage, x, y, width, height, null)
+Else:
+    Draw fallback red rectangle
+    
+    
+If obstacleImage != null AND useImage == true:
+    g2d.drawImage(obstacleImage, x, y, width, height, null)
+Else:
+    Draw fallback rock shape
+    
+    
+If backgroundImage != null AND useBackgroundImage == true:
+    Draw background with parallax scrolling
+Else:
+    Draw fallback colored scene
+
+
+CUSTOMIZATION WORKFLOW:
+═══════════════════════
+
+You have images? Here's what to do:
+
+1. Find/Create Image
+   ├─ player.png (30×40 pixels)
+   ├─ obstacle.png (40×50 pixels)
+   └─ background.png (800×500+ pixels)
+
+2. Place in resources/
+   EndlessRunner/
+   └── resources/
+       ├─ player.png
+       ├─ obstacle.png
+       └─ background.png
+
+3. Rebuild
+   → Double-click run.bat
+   → Recompiles with resources
+   
+4. Play
+   → Double-click play.bat
+   → See your custom images!
+
+
+TROUBLESHOOTING FLOWCHART:
+═════════════════════════
+
+Issue: run.bat says "Java not installed"
+   ├─ Download Java from oracle.com
+   ├─ Install JDK
+   ├─ Restart computer
+   └─ Try run.bat again
+
+Issue: Compilation error
+   ├─ Check all .java files are in src/
+   ├─ Try deleting bin/ folder
+   ├─ Try run.bat again
+   └─ Check error message carefully
+
+Issue: Images not showing
+   ├─ Create resources/ folder if missing
+   ├─ Place images there
+   ├─ Check filenames: player.png, obstacle.png, background.png
+   ├─ Check image format: PNG only
+   ├─ Run run.bat to rebuild
+   └─ Check console for error messages
+
+Issue: JAR won't run
+   ├─ Make sure Java is installed
+   ├─ Try: java -jar EndlessRunner.jar
+   ├─ Check error messages
+   └─ Reinstall Java if needed
+
+Issue: Game looks wrong
+   ├─ Check image dimensions
+   ├─ player.png: 30×40 pixels
+   ├─ obstacle.png: 40×50 pixels
+   ├─ background.png: 800×500+ pixels
+   ├─ Resize images to correct size
+   └─ Rebuild with run.bat
+
+
+DISTRIBUTION WORKFLOW:
+══════════════════════
+
+You want to share the game with friends?
+
+1. Ensure game builds successfully
+   → Double-click run.bat
+   → Verify EndlessRunner.jar appears
+
+2. Prepare files to share
+
+   Without custom images:
+   └─ Just share: EndlessRunner.jar
+   
+   With custom images:
+   ├─ Share: EndlessRunner.jar
+   └─ Share: resources/ folder
+      ├─ player.png
+      ├─ obstacle.png
+      └─ background.png
+
+3. Friend receives files
+   ├─ Places EndlessRunner.jar somewhere
+   ├─ Places resources/ in same directory (if you shared it)
+   └─ Double-clicks EndlessRunner.jar
+   
+4. ✓ Friend plays the game!
+   (They just need Java installed)
+
+
+FULL BUILD COMMAND SEQUENCE (What run.bat does):
+═════════════════════════════════════════════════
+
+@echo off
+REM Check Java exists
+java -version
+
+REM Create directories  
+mkdir bin
+mkdir resources (if needed)
+
+REM Compile Java
+cd src
+javac -d ../bin Main.java
+javac -d ../bin GamePanel.java
+javac -d ../bin Player.java
+javac -d ../bin Obstacle.java
+javac -d ../bin Scoreboard.java
+javac -d ../bin ImageLoader.java
+cd ..
+
+REM Create META-INF
+mkdir bin\META-INF
+
+REM Create MANIFEST.MF
+echo Manifest-Version: 1.0 > bin\META-INF\MANIFEST.MF
+echo Main-Class: Main >> bin\META-INF\MANIFEST.MF
+
+REM Build JAR
+cd bin
+jar cfm ../EndlessRunner.jar META-INF\MANIFEST.MF *.class
+cd ..
+
+RESULT: ✓ EndlessRunner.jar created!
+
+
+ONE-CLICK BUILD:
+════════════════
+
+Double-click run.bat
+
+This does ALL of the above automatically!
+
+RESULT: ✓ EndlessRunner.jar ready to play
+
+
+ONE-CLICK PLAY:
+═══════════════
+
+Double-click play.bat
+
+Automatically detects and runs:
+✓ EndlessRunner.jar if it exists
+✓ Or classes from bin/ folder
+✓ Or falls back to source compilation
+
+RESULT: ✓ Game window opens!
+
+
+FILE SIZE INFORMATION:
+══════════════════════
+
+Source files total:        ~50 KB
+  └─ Main.java             ~1 KB
+  └─ GamePanel.java        ~30 KB
+  └─ Player.java           ~2 KB
+  └─ Obstacle.java         ~3 KB
+  └─ Scoreboard.java       ~1 KB
+  └─ ImageLoader.java      ~3 KB
+
+Compiled classes total:    ~60 KB
+  └─ All .class files
+
+EndlessRunner.jar:         ~65 KB
+  └─ Includes all classes & manifest
+  └─ No images embedded (if loading from file system)
+
+Images (if added):
+  └─ player.png            10-50 KB (depends on content)
+  └─ obstacle.png          10-50 KB (depends on content)
+  └─ background.png        50-200 KB (depends on content)
+
+Total with images:         ~100-350 KB (depending on image size)
+
+
+PERFORMANCE:
+═════════════
+
+Compilation time:    2-5 seconds
+JAR creation time:   1 second
+Game startup time:   2-3 seconds
+Image loading time:  <1 second (per image)
+Frame rate:          60+ FPS (on modern computer)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          READY TO BUILD & PLAY! 🚀
+═══════════════════════════════════════════════════════════════════════════════

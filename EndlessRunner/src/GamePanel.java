@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -21,6 +22,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private Color skyColor;
     private Color grassColor;
     private int backgroundOffset = 0;
+    private BufferedImage backgroundImage;
+    private boolean useBackgroundImage;
+    private boolean isPaused = false;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -37,6 +41,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         backgroundOffset = 0;
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
+        
+        // Try to load background image
+        backgroundImage = ImageLoader.loadImage("/background.png");
+        useBackgroundImage = (backgroundImage != null);
 
         gameTimer = new javax.swing.Timer(30, this);
         gameTimer.start();
@@ -57,19 +65,24 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 drawNightBackground(g);
             } else {
                 // Draw day background
-                // Draw sky
-                g.setColor(skyColor);
-                g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+                if (useBackgroundImage && backgroundImage != null) {
+                    // Draw background image with parallax scrolling
+                    drawBackgroundImage(g2d);
+                } else {
+                    // Draw sky
+                    g.setColor(skyColor);
+                    g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
 
-                // Draw clouds
-                drawClouds(g);
+                    // Draw clouds
+                    drawClouds(g);
 
-                // Draw detailed road platform
-                drawDetailedRoad(g, false);
-                
-                // Draw flags and railings (background elements)
-                drawRailings(g);
-                drawFlags(g);
+                    // Draw detailed road platform
+                    drawDetailedRoad(g, false);
+                    
+                    // Draw flags and railings (background elements)
+                    drawRailings(g);
+                    drawFlags(g);
+                }
             }
 
             // Draw player
@@ -82,6 +95,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             // Draw scoreboard
             scoreboard.draw(g);
+            
+            // Draw pause menu if paused
+            if (isPaused) {
+                drawPauseMenu(g);
+            }
         } else {
             // Draw game over screen
             g.setColor(new Color(0, 0, 0, 200));
@@ -110,7 +128,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!gameOver) {
+        if (!gameOver && !isPaused) {
             // Update player
             player.update();
 
@@ -160,6 +178,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             // Increase speed slightly as score increases
             currentSpeed = BASE_SPEED + (scoreboard.getScore() / 200);
 
+            repaint();
+        } else if (!gameOver && isPaused) {
+            // Still repaint when paused to show pause menu
             repaint();
         }
     }
@@ -560,6 +581,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if (!gameOver) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 player.jump();
+            } else if (e.getKeyCode() == KeyEvent.VK_P) {
+                isPaused = !isPaused;
+            } else if (e.getKeyCode() == KeyEvent.VK_Q && isPaused) {
+                // Quit from pause menu - restart the game
+                System.exit(0);
             }
         } else {
             if (e.getKeyCode() == KeyEvent.VK_R) {
@@ -589,5 +615,63 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         skyColor = new Color(135, 206, 235);
         updateSkyColor();
         repaint();
+    }
+    
+    private void drawBackgroundImage(Graphics2D g2d) {
+        if (backgroundImage == null) return;
+        
+        int bgWidth = backgroundImage.getWidth();
+        int bgHeight = backgroundImage.getHeight();
+        
+        // Draw background image with parallax scrolling
+        int offsetX = backgroundOffset % bgWidth;
+        
+        // Draw the image and its repeated version for seamless scrolling
+        g2d.drawImage(backgroundImage, -offsetX, 0, bgWidth, bgHeight, null);
+        g2d.drawImage(backgroundImage, bgWidth - offsetX, 0, bgWidth, bgHeight, null);
+        
+        // If there's still a gap, draw another copy
+        if (bgWidth - offsetX - bgWidth < WIDTH) {
+            g2d.drawImage(backgroundImage, 2 * bgWidth - offsetX, 0, bgWidth, bgHeight, null);
+        }
+    }
+    
+    private void drawPauseMenu(Graphics g) {
+        // Dark overlay
+        g.setColor(new Color(0, 0, 0, 200));
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+        
+        // Title
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 60));
+        FontMetrics fm = g.getFontMetrics();
+        String pauseText = "PAUSED";
+        int x = (WIDTH - fm.stringWidth(pauseText)) / 2;
+        g.drawString(pauseText, x, 150);
+        
+        // Show current score
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        String scoreText = "Score: " + scoreboard.getScore();
+        fm = g.getFontMetrics();
+        x = (WIDTH - fm.stringWidth(scoreText)) / 2;
+        g.drawString(scoreText, x, 250);
+        
+        // Show lives
+        String livesText = "Lives: " + scoreboard.getLives();
+        fm = g.getFontMetrics();
+        x = (WIDTH - fm.stringWidth(livesText)) / 2;
+        g.drawString(livesText, x, 310);
+        
+        // Instructions
+        g.setFont(new Font("Arial", Font.PLAIN, 28));
+        String continueText = "Press 'P' to Continue";
+        fm = g.getFontMetrics();
+        x = (WIDTH - fm.stringWidth(continueText)) / 2;
+        g.drawString(continueText, x, 400);
+        
+        String quitText = "Press 'Q' to Main Menu";
+        fm = g.getFontMetrics();
+        x = (WIDTH - fm.stringWidth(quitText)) / 2;
+        g.drawString(quitText, x, 450);
     }
 }

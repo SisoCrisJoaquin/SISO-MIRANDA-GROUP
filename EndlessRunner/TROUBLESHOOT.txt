@@ -1,0 +1,212 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         ENDLESS RUNNER - BUILD TROUBLESHOOTING GUIDE                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🔴 ISSUE: run.bat (or build.bat) opens and immediately closes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SOLUTIONS (Try in this order):
+
+1️⃣  RUN THE DIAGNOSTIC SCRIPT FIRST
+    ────────────────────────────────
+    
+    Double-click: diagnose.bat
+    
+    This will check:
+    ✓ Java installation
+    ✓ Source files location
+    ✓ Java compiler availability
+    ✓ JAR tool availability
+    
+    Look for any ✗ errors - those are the problems to fix
+
+
+2️⃣  JAVA NOT INSTALLED - Most Common Issue
+    ────────────────────────────────────────
+    
+    If diagnose.bat shows "Java not installed":
+    
+    a) Download Java:
+       - Go to: oracle.com/java
+       - Or: adoptium.net
+       - Click "Download"
+    
+    b) Install:
+       - Run the installer
+       - Choose "JDK" (not JRE)
+       - Follow installation steps
+       - Accept defaults
+    
+    c) Restart Computer:
+       - This is IMPORTANT!
+       - Java won't work until you restart
+    
+    d) Try Again:
+       - Double-click: diagnose.bat
+       - Should show ✓ Java found
+       - Then try: run.bat or build.bat
+
+
+3️⃣  WRONG FOLDER - Second Most Common Issue
+    ────────────────────────────────────────
+    
+    If diagnose.bat shows "Not in EndlessRunner folder":
+    
+    a) Navigate to correct folder:
+       Path: C:\Users\John Paul\Downloads\Endless runner game\SISO-MIRANDA-GROUP\EndlessRunner
+    
+    b) Check that you see these files/folders:
+       ✓ src/ folder
+       ✓ resources/ folder
+       ✓ run.bat
+       ✓ build.bat
+       ✓ diagnose.bat
+    
+    c) Now run: diagnose.bat
+
+
+4️⃣  TRY THE SIMPLER BUILD SCRIPT
+    ────────────────────────────────
+    
+    If run.bat doesn't work, try:
+    Double-click: build.bat
+    
+    This is simpler and might work better
+
+
+5️⃣  RUN FROM COMMAND PROMPT (To see error messages)
+    ─────────────────────────────────────────────────
+    
+    a) Press: Windows Key + R
+    b) Type: cmd
+    c) Click: OK
+    
+    d) Navigate to EndlessRunner:
+       cd "C:\Users\John Paul\Downloads\Endless runner game\SISO-MIRANDA-GROUP\EndlessRunner"
+    
+    e) Try compiling:
+       cd src
+       javac *.java
+       
+    f) Look at error messages carefully
+       The error message will tell you what's wrong
+
+
+6️⃣  CHECK JAVA PATH
+    ────────────────
+    
+    If Java is installed but not working:
+    
+    a) Open Command Prompt
+    b) Type: java -version
+    c) If it works, type: javac -version
+    
+    d) If this fails, Java might not be in your PATH
+       Solution: Reinstall Java and make sure to add it to PATH
+
+
+7️⃣  CLEAN AND REBUILD
+    ───────────────────
+    
+    If you've tried multiple times:
+    
+    a) Delete the "bin" folder
+    b) Delete "EndlessRunner.jar" if it exists
+    c) Double-click: build.bat
+
+
+8️⃣  CHECK FILE PERMISSIONS
+    ───────────────────────
+    
+    If nothing works:
+    
+    a) Right-click: build.bat
+    b) Click: Run as Administrator
+    c) Try again
+
+
+9️⃣  VERIFY SOURCE FILES EXIST
+    ──────────────────────────
+    
+    In the src/ folder, you should see:
+    ✓ Main.java
+    ✓ GamePanel.java
+    ✓ Player.java
+    ✓ Obstacle.java
+    ✓ Scoreboard.java
+    ✓ ImageLoader.java
+    
+    If any are missing, something went wrong with the setup
+
+
+🔟 MANUAL COMPILE (Last Resort)
+    ──────────────────────────────
+    
+    If batch scripts don't work:
+    
+    a) Open Command Prompt
+    b) Navigate to EndlessRunner folder
+    c) Run these commands one by one:
+    
+       mkdir bin
+       mkdir resources
+       cd src
+       javac -d ../bin Main.java GamePanel.java Player.java Obstacle.java Scoreboard.java ImageLoader.java
+       cd ..
+       mkdir bin\META-INF
+       echo Manifest-Version: 1.0 > bin\META-INF\MANIFEST.MF
+       echo Main-Class: Main >> bin\META-INF\MANIFEST.MF
+       cd bin
+       jar cfm ../EndlessRunner.jar META-INF\MANIFEST.MF *.class
+       cd ..
+       
+    d) You should now have: EndlessRunner.jar
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ AFTER YOU FIX THE ISSUE:
+
+Once build works:
+1. Double-click: run.bat or build.bat
+2. Wait for it to complete
+3. Look for: "SUCCESS" or "Build successful"
+4. Check that EndlessRunner.jar was created
+5. Double-click: play.bat to play
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 QUICK REFERENCE:
+
+Problem                          Solution
+─────────────────────────────────────────────────────────────────
+Java not installed              Download & install JDK, restart
+Wrong folder                    Navigate to EndlessRunner folder
+run.bat closes immediately      Run: diagnose.bat first
+build.bat fails                 Try: build.bat instead of run.bat
+Command not found               Install Java
+Can't find folder               Use full path shown above
+Permission denied               Run as Administrator
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 IF ALL ELSE FAILS:
+
+1. Run diagnose.bat and note all errors
+2. Make sure Java is installed: oracle.com/java
+3. Try build.bat instead of run.bat
+4. Check that all files exist in src/ folder
+5. Restart your computer
+
+For success, you need:
+✓ Java JDK installed
+✓ In EndlessRunner folder
+✓ All .java files present in src/
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                    GOOD LUCK! YOU'VE GOT THIS! 🚀
+═══════════════════════════════════════════════════════════════════════════════

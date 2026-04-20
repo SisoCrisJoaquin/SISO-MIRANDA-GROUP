@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Player {
     private int x;
@@ -11,6 +12,8 @@ public class Player {
     private final int JUMP_STRENGTH = 15;
     private final int GRAVITY = 1;
     private final int MAX_FALL_SPEED = 20;
+    private BufferedImage playerImage;
+    private boolean useImage;
 
     public Player(int groundY, int screenWidth) {
         this.width = 30;
@@ -20,6 +23,10 @@ public class Player {
         this.groundY = groundY;
         this.velocityY = 0;
         this.isJumping = false;
+        
+        // Try to load player image from resources
+        this.playerImage = ImageLoader.loadImage("/player.png");
+        this.useImage = (playerImage != null);
     }
 
     public void update() {
@@ -46,12 +53,19 @@ public class Player {
     }
 
     public void draw(Graphics g) {
-        g.setColor(new Color(255, 100, 100));
-        g.fillRect(x, y, width, height);
-        g.setColor(Color.BLACK);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setStroke(new BasicStroke(2));
-        g2d.drawRect(x, y, width, height);
+        if (useImage && playerImage != null) {
+            // Draw player image
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.drawImage(playerImage, x, y, width, height, null);
+        } else {
+            // Fallback to colored rectangle
+            g.setColor(new Color(255, 100, 100));
+            g.fillRect(x, y, width, height);
+            g.setColor(Color.BLACK);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawRect(x, y, width, height);
+        }
     }
 
     public Rectangle getBounds() {

@@ -1,0 +1,139 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    ENDLESS RUNNER GAME - QUICK START                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+👋 WELCOME!
+
+Your game has been updated with IMAGE SUPPORT and JAR BUILD SYSTEM!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TO PLAY THE GAME - 2 STEPS:
+
+  STEP 1: Click run.bat
+     → This builds your game into EndlessRunner.jar
+     → Compiles all Java files automatically
+     
+  STEP 2: Click play.bat (or double-click EndlessRunner.jar)
+     → The game starts immediately!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️ TO ADD CUSTOM IMAGES:
+
+  1. Create or find 3 PNG images:
+     • player.png (30×40 pixels) - Your player character
+     • obstacle.png (40×50 pixels) - What to avoid
+     • background.png (800×500+ pixels) - The environment
+     
+  2. Place them in the resources/ folder
+  
+  3. Click run.bat to rebuild
+  
+  4. Click play.bat to see your custom graphics!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 FILES IN THIS FOLDER:
+
+  run.bat                  → Click to BUILD the game
+  play.bat                 → Click to PLAY the game  
+  EndlessRunner.jar        → Created after build - this IS the game!
+  
+  src/                     → Java source files
+  resources/               → Your custom images go here
+  
+  SETUP.md                 → Complete setup & troubleshooting guide
+  IMPLEMENTATION_SUMMARY.md → Full details of changes made
+  resources/IMAGES_README.md → How to create/add images
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ QUICK REFERENCE:
+
+  ACTION                      WHAT TO DO
+  ─────────────────────────────────────────────────────
+  Build the game            → Double-click run.bat
+  Play the game             → Double-click play.bat
+  Play from JAR directly    → Double-click EndlessRunner.jar
+  Play from terminal        → java -jar EndlessRunner.jar
+  Add custom images         → Put PNG files in resources/
+  Understand how to build   → Read SETUP.md
+  Learn about images        → Read resources/IMAGES_README.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ WHAT'S NEW:
+
+  ✅ Image Support
+     - Player, obstacles, and background now support custom PNG images
+     - Falls back to colored shapes if no images found
+     - Full parallax scrolling for backgrounds
+
+  ✅ JAR Executable
+     - Game now builds into EndlessRunner.jar
+     - Run like any game on Windows/Mac/Linux
+     - Just need Java installed
+
+  ✅ Automated Build
+     - run.bat handles compilation & JAR creation
+     - No manual javac commands needed
+     - Creates all necessary folders automatically
+
+  ✅ Complete Documentation
+     - SETUP.md for detailed setup instructions
+     - IMAGES_README.md for image customization
+     - IMPLEMENTATION_SUMMARY.md for technical details
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🕹️ GAME CONTROLS:
+
+  SPACE or UP ARROW   → Jump over obstacles
+  R                   → Restart (after game over)
+  Q                   → Quit (after game over)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ REQUIREMENTS:
+
+  ✓ Java installed (download from oracle.com or adoptium.net)
+  ✓ Windows, Mac, or Linux
+  ✓ 100MB RAM available
+  ✓ 10MB disk space
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 TROUBLESHOOTING:
+
+  "run.bat says Java is not installed"
+  → Download Java from oracle.com/java, restart, try again
+  
+  "Game won't build"
+  → Make sure all .java files are in src/ folder
+  → Try deleting the bin/ folder and running run.bat again
+  
+  "Images not showing"
+  → Create resources/ folder if it doesn't exist
+  → Make sure image files are PNG format
+  → Use exact names: player.png, obstacle.png, background.png
+  → Run run.bat again to rebuild
+
+  For more help → Read SETUP.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 LET'S GO!
+
+  1. Double-click run.bat (wait for it to finish)
+  2. Double-click play.bat
+  3. ENJOY YOUR GAME! 🎮
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Questions? Check:
+  • SETUP.md - Full setup guide
+  • resources/IMAGES_README.md - Image guide
+  • IMPLEMENTATION_SUMMARY.md - Technical details
+
+Happy gaming! 🏃‍♂️🎮

@@ -4,21 +4,25 @@ A fun and addictive endless runner game built in pure Java using Swing!
 
 ## Features
 
+✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
+✅ **Pause Menu** - Press P to pause and see your score and lives  
 ✅ **Player with 3 Lives** - Lose all lives and it's game over  
 ✅ **Grassy Field Platform** - Run on a beautiful green field  
-✅ **Spike Obstacles** - Avoid red spikes to keep running  
+✅ **Spike Obstacles** - Avoid rocks and obstacles to keep running  
 ✅ **Dynamic Scoreboard** - Track your score and remaining lives (top-left corner)  
-✅ **Sky Transition** - Background changes from sunny (light blue) to darkened skies at score 100  
+✅ **Sky Transition** - Background changes from sunny (light blue) to darkened skies at score 500  
 ✅ **Collision Detection** - Hit an obstacle? Lose a life and restart  
 ✅ **Game Over Screen** - Restart or quit when you run out of lives  
 ✅ **Increasing Difficulty** - Game speeds up as your score increases  
+✅ **Custom Graphics Support** - Add your own PNG images for player, obstacles, and backgrounds  
 
 ## How to Play
 
 ### Controls
-- **SPACEBAR** - Jump over obstacles
+- **SPACEBAR** - Jump over obstacles / Start game from menu
+- **P** - Pause/Unpause game during gameplay
 - **R** - Restart game (when game over)
-- **Q** - Quit game (when game over)
+- **Q** - Quit to menu (when paused) or quit game (when game over)
 
 ### Objective
 - Run as far as possible without hitting spikes
@@ -34,6 +38,7 @@ run.bat
 ```
 
 ### Option 2: Manual Compilation
+
 ```bash
 cd src
 javac *.java
@@ -48,11 +53,13 @@ java -cp ../src Main
 
 ## Game Structure
 
-- **Main.java** - Entry point, creates the game window
-- **GamePanel.java** - Main game loop, rendering, and collision detection
+- **Main.java** - Entry point, manages menu and game switching
+- **MenuPanel.java** - Main menu with instructions and controls
+- **GamePanel.java** - Main game loop, rendering, collision detection, and pause menu
 - **Player.java** - Player character with jump mechanics
-- **Obstacle.java** - Spike obstacle with collision bounds
+- **Obstacle.java** - Obstacle with collision bounds
 - **Scoreboard.java** - Score tracking and life management
+- **ImageLoader.java** - Handles loading custom images from resources folder
 
 ## Game Mechanics
 
@@ -85,6 +92,17 @@ java -cp ../src Main
 - **Score 100+**: Gradually darkens to deep blue skies
 - Creates a sense of progressing through time
 
+### Main Menu
+- Shows on game startup
+- Displays game title and controls
+- Press SPACEBAR to begin playing
+
+### Pause Menu
+- Press P during gameplay to pause
+- Shows current score and lives
+- Press P again to resume
+- Press Q to quit and return to main menu
+
 ## Tips for Playing
 
 1. **Timing is Key** - Jump early to clear obstacles safely
@@ -92,6 +110,15 @@ java -cp ../src Main
 3. **Stay Centered** - The player automatically moves back to starting position
 4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
 5. **Watch the Sky** - When it darkens, you've reached score 100! Keep going!
+
+## Recent Updates
+
+### Version 2.0 - Menu & Pause System
+- ✨ **Main Menu**: Beautiful start screen with game instructions and controls display
+- ⏸️ **Pause Menu**: Press P to pause and view current score and lives
+- 🎮 **Enhanced UI**: Cleaner game flow with menu-to-game transitions
+- 📋 **MenuPanel.java**: New class for menu rendering and controls
+- 🔄 **Updated Main.java**: Uses CardLayout for smooth menu/game switching
 
 ---
 
