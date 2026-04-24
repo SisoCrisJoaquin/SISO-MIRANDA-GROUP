@@ -5,6 +5,7 @@ A fun and addictive endless runner game built in pure Java using Swing!
 ## Features
 
 ✅ **Smooth Day/Night Transitions** - Beautiful continuous color blending every 1000 points  
+✅ **3-Lane System** - Switch between top, middle, and bottom lanes with W/S keys for depth perception  
 ✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
 ✅ **Pause Menu** - Press P to pause and see your score and lives  
 ✅ **Player with 3 Lives** - Lose all lives and it's game over  
@@ -14,20 +15,25 @@ A fun and addictive endless runner game built in pure Java using Swing!
 ✅ **Collision Detection** - Hit an obstacle? Lose a life and restart  
 ✅ **Game Over Screen** - Restart or quit when you run out of lives  
 ✅ **Increasing Difficulty** - Game speeds up as your score increases  
-✅ **Custom Graphics Support** - Add your own PNG images for player, obstacles, and backgrounds  
+✅ **Fully Customizable Graphics** - All visual elements use image-based rendering for easy customization  
+✅ **Background Elements** - Clouds, railings, flags, and trees with parallax scrolling  
 
 ## How to Play
 
 ### Controls
 - **SPACEBAR** - Jump over obstacles / Start game from menu
+- **W** - Move up to top lane (gets smaller for 3D effect)
+- **S** - Move down to bottom lane (gets larger for 3D effect)
 - **P** - Pause/Unpause game during gameplay
 - **R** - Restart game (when game over)
 - **Q** - Quit to menu (when paused) or quit game (when game over)
 
 ### Objective
-- Run as far as possible without hitting spikes
+- Run as far as possible without hitting obstacles
+- Dodge obstacles in all 3 lanes (top, middle, bottom)
 - Each frame you survive increases your score by 1
 - Avoid obstacles to keep your 3 lives
+- Switch lanes strategically to avoid incoming traffic
 - When score reaches 100, the sky darkens - but the obstacles keep coming!
 
 ## Compilation & Running
@@ -67,22 +73,32 @@ play.bat
 - **MENUPANEL.JAVA** - Main menu screen with game title and controls display
 - **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, and smooth transitions
 - **PLAYER.JAVA** - Player character with jump mechanics and gravity
-- **OBSTACLE.JAVA** - Obstacle spawning and collision detection
+- **OBSTACLE.JAVA** - Obstacle spawning and collision detection (image-based)
+- **CLOUD.JAVA** - Cloud background elements with parallax scrolling (image-based)
+- **RAILING.JAVA** - Platform railings decoration (image-based)
+- **FLAG.JAVA** - Background flags decoration (image-based)
+- **TREE.JAVA** - Background trees for day/night modes (image-based)
 - **SCOREBOARD.JAVA** - Score tracking and life management system
 - **IMAGELOADER.JAVA** - Custom image loading from resources folder
 
 ## Game Mechanics
 
 ### Player
-- Starts on the left side of the platform
-- Can jump with spacebar
+- Starts in the middle lane
+- Can jump with SPACEBAR
+- Can switch lanes with W (up) and S (down)
+- Uses 3D perspective scaling:
+  - **Top lane**: Player appears smaller (0.8x scale)
+  - **Middle lane**: Normal size (1.0x scale)
+  - **Bottom lane**: Player appears larger (1.2x scale)
 - Gravity pulls the player back down to the platform
-- Resets to starting position when hitting an obstacle
+- Resets to middle lane when hitting an obstacle
 
 ### Obstacles
-- Randomly spawn from the right side of the screen
+- Randomly spawn from the right side in all 3 lanes (top, middle, bottom)
+- 10 randomized obstacle types (obstacle1.png through obstacle10.png)
 - Move left at increasing speeds
-- Designed as red spike triangles
+- Apply the same 3D perspective scaling as the player
 - Removed when they leave the screen
 
 ### Scoring System
@@ -121,7 +137,35 @@ play.bat
 4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
 5. **Watch the Sky** - When it darkens, you've reached score 100! Keep going!
 
-## Build System
+## Customizing Graphics with Your Own Images
+
+All game graphics are now **image-based** instead of hardcoded! You can easily customize the game appearance by providing PNG images in the `resources/` folder.
+
+### Required Image Files
+- **player.png** - Game player character (140x100 pixels)
+- **obstacle.png** - Game obstacles fallback (140x100 pixels)
+- **obstacle1.png through obstacle10.png** - 10 randomized obstacle types (140x100 pixels each)
+- **cloud.png** - Sky clouds (60-80 pixels)
+- **railing.png** - Platform railings (80x25 pixels)
+- **flag.png** - Background flags (50x30 pixels)
+- **tree.png** - Day mode trees (50x80 pixels)
+- **tree-night.png** - Night mode trees (50x80 pixels)
+- **background.png** - Day mode background (800x500+ pixels)
+- **background-night.png** - Night mode background (800x500+ pixels)
+
+### How to Add Custom Images
+1. Create or source PNG images for the elements you want to customize
+2. Place them in the `resources/` folder
+3. Name them exactly as specified above
+4. Restart the game - your custom images will load automatically!
+
+### Image Tips
+- Use PNG format with transparent backgrounds (alpha channel)
+- If an image is not found, that element simply won't render
+- Check the console output for any image loading errors
+- For best results, use sprites with consistent aspect ratios
+
+See `ASSETS_REMOVED.txt` for detailed technical information about removed hardcoded graphics.
 
 ### Build Scripts (Windows)
 - **build.bat** - Compiles all Java source files to the `bin/` folder
@@ -139,6 +183,24 @@ play.bat
 - Provides better error handling and colored output
 
 ## Recent Updates
+
+### Version 3.0 - Complete Image-Based Refactor ✨
+- 🎨 **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
+- ❌ **Removed Hardcoded Graphics:**
+  - Obstacle rocks (detailed 3D-style drawings)
+  - Cloud formations (fluffy white shapes)
+  - Platform railings (geometric lines)
+  - Background flags (colored rectangles)
+  - Forest trees (polygon-based shapes)
+- 📦 **New Classes:**
+  - `Cloud.java` - Image-based cloud management
+  - `Railing.java` - Image-based railing decoration
+  - `Flag.java` - Image-based flag decoration
+  - `Tree.java` - Image-based tree management (day/night)
+- 🖼️ **Complete Customization Support** - Provide PNG images in resources/ folder
+- 📄 **Documentation** - Updated IMAGES_README.md with new image specifications
+- 🐛 **Code Quality** - Eliminated duplicate hardcoded drawing methods
+- 📋 **Asset Tracking** - Created ASSETS_REMOVED.txt for technical reference
 
 ### Version 2.2 - Bug Fixes & Code Quality
 - 🐛 **Fixed Smooth Transitions**: Eliminated abrupt day/night switching - now perfectly smooth (400-600 & 900-1000 point zones)

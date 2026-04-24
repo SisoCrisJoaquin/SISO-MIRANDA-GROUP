@@ -20,6 +20,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private Player player;
     private Scoreboard scoreboard;
     private ArrayList<Obstacle> obstacles;
+    private ArrayList<Cloud> clouds;
+    private ArrayList<Railing> railings;
+    private ArrayList<Flag> flags;
+    private ArrayList<Tree> trees;
     private Timer gameTimer;
     private int obstacleSpawnCounter;
     private int currentSpeed;
@@ -28,6 +32,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private Color grassColor;
     private int backgroundOffset = 0;
     private BufferedImage backgroundImage;
+    private BufferedImage backgroundNightImage;
     private boolean useBackgroundImage;
     private boolean isPaused = false;
 
@@ -40,6 +45,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         player = new Player(GROUND_Y, WIDTH);
         scoreboard = new Scoreboard();
         obstacles = new ArrayList<>();
+        clouds = new ArrayList<>();
+        railings = new ArrayList<>();
+        flags = new ArrayList<>();
+        trees = new ArrayList<>();
         obstacleSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         gameOver = false;
@@ -47,9 +56,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
         
-        // Try to load background image
+        // Initialize clouds, railings, flags, and trees
+        initializeClouds();
+        initializeRailings();
+        initializeFlags();
+        initializeTrees();
+        
+        // Try to load background images
         backgroundImage = ImageLoader.loadImage("/background.png");
-        useBackgroundImage = (backgroundImage != null);
+        backgroundNightImage = ImageLoader.loadImage("/background-night.png");
+        useBackgroundImage = (backgroundImage != null || backgroundNightImage != null);
 
         gameTimer = new javax.swing.Timer(30, this);
         gameTimer.start();
@@ -66,36 +82,56 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             boolean isNightMode = isNightTime();
             
             if (isNightMode) {
-                // Draw night background
-                drawNightBackground(g);
+                // Draw night sky
+                g.setColor(new Color(25, 35, 65));
+                g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+                
+                // Draw night background image if available
+                if (backgroundNightImage != null) {
+                    backgroundImage = backgroundNightImage;
+                    drawBackgroundImage(g2d);
+                }
+                
+                // Draw trees
+                for (Tree tree : trees) {
+                    tree.draw(g);
+                }
             } else {
                 // Draw day background
-                if (useBackgroundImage && backgroundImage != null) {
-                    // Draw background image with parallax scrolling
+                if (backgroundImage != null) {
                     drawBackgroundImage(g2d);
                 } else {
-                    // Draw sky
                     g.setColor(skyColor);
                     g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
 
-                    // Draw clouds
-                    drawClouds(g);
-
-                    // Draw detailed road platform
-                    drawDetailedRoad(g, false);
+                    for (Cloud cloud : clouds) {
+                        cloud.draw(g);
+                    }
                     
-                    // Draw flags and railings (background elements)
-                    drawRailings(g);
-                    drawFlags(g);
+                    for (Railing railing : railings) {
+                        railing.draw(g);
+                    }
+                    
+                    for (Flag flag : flags) {
+                        flag.draw(g);
+                    }
                 }
             }
 
-            // Draw player
-            player.draw(g);
-
-            // Draw obstacles
-            for (Obstacle obstacle : obstacles) {
-                obstacle.draw(g);
+            // Draw by lane for proper depth layering
+            // Lane 0 (top/furthest) -> Lane 1 (middle) -> Lane 2 (bottom/closest)
+            for (int lane = 0; lane <= 2; lane++) {
+                // Draw player if in this lane
+                if (player.getLane() == lane) {
+                    player.draw(g);
+                }
+                
+                // Draw all obstacles in this lane
+                for (Obstacle obstacle : obstacles) {
+                    if (obstacle.getLane() == lane) {
+                        obstacle.draw(g);
+                    }
+                }
             }
 
             // Draw scoreboard
@@ -145,16 +181,17 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 }
             }
 
-            // Spawn obstacles
+            // Spawn obstacles in random lanes
             obstacleSpawnCounter++;
             if (obstacleSpawnCounter >= OBSTACLE_SPAWN_RATE) {
-                obstacles.add(new Obstacle(WIDTH, GROUND_Y, currentSpeed));
+                int randomLane = new Random().nextInt(3);
+                obstacles.add(new Obstacle(WIDTH, GROUND_Y, currentSpeed, randomLane));
                 obstacleSpawnCounter = 0;
             }
 
-            // Check collisions with obstacles
+            // Check collisions with obstacles (only same lane)
             for (Obstacle obstacle : obstacles) {
-                if (player.getBounds().intersects(obstacle.getBounds())) {
+                if (player.getBounds().intersects(obstacle.getBounds()) && player.getLane() == obstacle.getLane()) {
                     scoreboard.loseLife();
                     if (scoreboard.isGameOver()) {
                         gameOver = true;
@@ -176,6 +213,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             if (backgroundOffset > 3200) {
                 backgroundOffset -= 3200;
             }
+            
+            // Update cloud positions
+            updateCloudPositions();
+            
+            // Update railing, flag, and tree positions
+            updateRailingPositions();
+            updateFlagPositions();
+            updateTreePositions();
 
             // Update sky based on score
             updateSkyColor();
@@ -191,158 +236,48 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawClouds(Graphics g) {
-        g.setColor(new Color(255, 255, 255, 220)); // White clouds with slight transparency
-        
-        // Define cloud patterns that repeat continuously
-        int[] cloudX = {100, 200, 300, 420, 550, 600, 700, 850, 950, 1050, 1150, 1300, 1400, 1550, 1700, 1850, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000};
-        int[] cloudY = {80, 140, 160, 120, 100, 140, 100, 130, 80, 150, 110, 90, 140, 100, 120, 80, 150, 110, 90, 140, 100, 120, 150, 80};
-        int[] cloudW = {80, 60, 50, 100, 70, 90, 90, 70, 80, 60, 100, 90, 70, 80, 100, 90, 70, 80, 100, 90, 70, 80, 90, 100};
-        int[] cloudH = {40, 30, 25, 45, 35, 42, 42, 38, 40, 30, 45, 42, 35, 40, 45, 42, 35, 40, 45, 42, 35, 40, 42, 45};
-        
-        // Draw clouds with parallax scrolling and wrapping
-        for (int i = 0; i < cloudX.length; i++) {
-            int scrolledX = (cloudX[i] - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            
-            // Draw current position
-            drawCloud(g, scrolledX, cloudY[i], cloudW[i], cloudH[i]);
-            
-            // Draw wrapped version if needed
-            if (scrolledX + cloudW[i] < WIDTH) {
-                int wrappedX = scrolledX + 3200;
-                if (wrappedX < WIDTH) {
-                    drawCloud(g, wrappedX, cloudY[i], cloudW[i], cloudH[i]);
-                }
-            }
-        }
+        // This method has been removed. Clouds are now managed by the Cloud class.
+        // Provide cloud.png in the resources folder to display custom cloud sprites.
     }
 
     private void drawCloud(Graphics g, int x, int y, int width, int height) {
-        // Draw cloud using circles to create a fluffy effect with more detail
-        Graphics2D g2d = (Graphics2D) g;
-        
-        // Highlight/shadow for depth
-        g2d.setColor(new Color(255, 255, 255, 240)); // Bright white
-        g2d.fillOval(x, y, width / 3, height);
-        g2d.fillOval(x + width / 4, y - height / 3, width / 2, height);
-        g2d.fillOval(x + width / 2, y, width / 3, height);
-        
-        // Darker layer for shadow/depth
-        g2d.setColor(new Color(200, 200, 200, 180));
-        g2d.fillOval(x + 2, y + 3, width / 4, height - 8);
-        g2d.fillOval(x + width / 3, y + height - 5, width / 3, height / 4);
+        // This method has been removed. Use cloud.png image instead.
     }
 
     private void drawRailings(Graphics g) {
-        // Draw continuous railings (horizontal lines) at fixed height
-        Graphics2D g2d = (Graphics2D) g;
-        
-        int railingY1 = GROUND_Y - 110; // Upper railing
-        int railingY2 = GROUND_Y - 95;  // Lower railing
-        
-        // Draw continuous railings across the screen with wrapping
-        g2d.setColor(new Color(100, 100, 100)); // Gray railing color
-        g2d.setStroke(new BasicStroke(2));
-        
-        // Draw horizontal rails as continuous lines (no gaps)
-        for (int segmentX = 0; segmentX < WIDTH + 3200; segmentX += 3200) {
-            int start = segmentX - backgroundOffset;
-            int end = start + 3200;
-            
-            // Upper horizontal rail
-            if (start < WIDTH && end > 0) {
-                int drawStart = Math.max(0, start);
-                int drawEnd = Math.min(WIDTH, end);
-                g2d.drawLine(drawStart, railingY1, drawEnd, railingY1);
-            }
-            
-            // Lower horizontal rail
-            if (start < WIDTH && end > 0) {
-                int drawStart = Math.max(0, start);
-                int drawEnd = Math.min(WIDTH, end);
-                g2d.drawLine(drawStart, railingY2, drawEnd, railingY2);
-            }
-        }
-        
-        // Vertical posts for railings (continuous without cutoffs)
-        g2d.setStroke(new BasicStroke(3));
-        for (int baseX = 0; baseX < 3200; baseX += 60) {
-            for (int segmentX = 0; segmentX < WIDTH + 3200; segmentX += 3200) {
-                int postX = baseX + segmentX - backgroundOffset;
-                
-                if (postX >= 0 && postX < WIDTH) {
-                    // Draw vertical post
-                    g2d.drawLine(postX, railingY1, postX, railingY2);
-                }
-            }
-        }
+        // This method has been removed. Railings are now managed by the Railing class.
+        // Provide railing.png in the resources folder to display custom railing sprites.
     }
     
     private void drawFlags(Graphics g) {
-        // Define flag positions (same spacing as trees/bushes)
-        int[] flagX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        int flagY = 130; // Far from platform, in the background
-        
-        // Flag colors - vary the colors
-        Color[] flagColors = {
-            new Color(255, 0, 0),       // Red
-            new Color(0, 0, 255),       // Blue
-            new Color(255, 255, 0),     // Yellow
-            new Color(0, 255, 0),       // Green
-            new Color(255, 165, 0),     // Orange
-            new Color(128, 0, 128),     // Purple
-            new Color(255, 192, 203),   // Pink
-            new Color(0, 255, 255),     // Cyan
-        };
-        
-        // Draw flags with parallax scrolling and wrapping
-        for (int i = 0; i < flagX.length; i++) {
-            int scrolledX = (flagX[i] - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            
-            // Determine flag color (cycle through colors)
-            Color flagColor = flagColors[i % flagColors.length];
-            
-            // Draw current position
-            drawFlag(g, scrolledX, flagY, flagColor);
-            
-            // Draw wrapped version if needed
-            if (scrolledX + 50 < WIDTH) {
-                int wrappedX = scrolledX + 3200;
-                if (wrappedX < WIDTH) {
-                    drawFlag(g, wrappedX, flagY, flagColor);
-                }
-            }
-        }
+        // This method has been removed. Flags are now managed by the Flag class.
+        // Provide flag.png in the resources folder to display custom flag sprites.
     }
     
     private void drawFlag(Graphics g, int x, int y, Color flagColor) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        // Flag pole - long, reaching from flag position to near ground
-        g2d.setColor(new Color(139, 69, 19));
-        int poleHeight = (GROUND_Y - 80) - y; // Height from flag to platform
-        g2d.fillRect(x - 3, y, 6, poleHeight);
-        
-        // Flag fabric - rectangular flag at the top
-        g2d.setColor(flagColor);
-        g2d.fillRect(x + 3, y, 30, 20);
-        
-        // Flag border for definition
-        g2d.setColor(new Color(0, 0, 0));
-        g2d.setStroke(new BasicStroke(1));
-        g2d.drawRect(x + 3, y, 30, 20);
-        
-        // Flag wave effect (small curves on flag edge)
-        g2d.setColor(flagColor);
-        int[] flagWaveX = {x + 32, x + 32, x + 32};
-        int[] flagWaveY = {y + 2, y + 10, y + 17};
-        g2d.fillPolygon(flagWaveX, flagWaveY, 3);
+        // This method has been removed. Use flag.png image instead.
+    }
+    
+    private void drawNightForestBackground(Graphics g) {
+        // This method has been removed. Trees are now managed by the Tree class.
+        // Provide tree-night.png in the resources folder for custom night trees.
+    }
+    
+    private void drawPineTree(Graphics2D g, int x, int y, float scale) {
+        // This method has been removed. Use tree-night.png image instead.
+    }
+    
+    private void drawNightForest(Graphics g) {
+        // This method has been removed. Trees are now managed by the Tree class.
+        // Provide tree.png for day trees and tree-night.png for night trees.
+    }
+    
+    private void drawTree(Graphics g, int x, int y, int height) {
+        // This method has been removed. Use tree.png image instead.
+    }
+    
+    private void drawBackgroundTree(Graphics g, int x, int y, int height) {
+        // This method has been removed. Use tree.png image instead.
     }
 
     private boolean isNightTime() {
@@ -393,78 +328,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
         drawStars(g);
         
-        // Draw forest trees as background elements (like clouds)
-        drawNightForestBackground(g);
+        // Draw trees from tree list (image-based)
+        for (Tree tree : trees) {
+            tree.draw(g);
+        }
         
         // Draw detailed road platform for night
         drawDetailedRoad(g, true);
     }
-    
-    private void drawNightForestBackground(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        // Define tree positions that repeat continuously (like clouds and bushes)
-        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        int[] treeY = {GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 85, GROUND_Y - 90, GROUND_Y - 88, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85};
-        float[] treeScale = {1.0f, 1.3f, 0.7f, 1.5f, 0.8f, 1.2f, 1.4f, 0.9f, 1.1f, 1.6f, 0.7f, 1.3f, 1.0f, 1.4f, 0.8f, 1.2f, 1.5f, 0.9f, 1.1f, 1.3f, 0.8f};
-        
-        // Draw trees with parallax scrolling and wrapping (same pattern as clouds/bushes)
-        for (int i = 0; i < treeX.length; i++) {
-            int scrolledX = (treeX[i] - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            
-            // Draw current position
-            drawPineTree(g2d, scrolledX, treeY[i], treeScale[i]);
-            
-            // Draw wrapped version if needed
-            if (scrolledX + 50 < WIDTH) {
-                int wrappedX = scrolledX + 3200;
-                if (wrappedX < WIDTH) {
-                    drawPineTree(g2d, wrappedX, treeY[i], treeScale[i]);
-                }
-            }
-        }
-    }
-    
-    private void drawPineTree(Graphics2D g, int x, int y, float scale) {
-        // Trunk
-        g.setColor(new Color(101, 67, 33));
-        int trunkW = (int)(16 * scale);
-        int trunkH = (int)(30 * scale);
-        g.fillRect((int)(x - trunkW / 2), (int)(y + 5 * scale), trunkW, trunkH);
-        
-        // Shadow/dark side for depth
-        g.setColor(new Color(60, 40, 20));
-        g.fillRect((int)(x - trunkW / 2), (int)(y + 5 * scale), (int)(trunkW / 2), trunkH);
-        
-        // Foliage - multiple triangles stacked tightly
-        g.setColor(new Color(34, 120, 50)); // Dark green
-        
-        // Layer 1 (bottom) - widest
-        int[] xPoints1 = {(int)(x - 20 * scale), (int)(x + 20 * scale), (int)x};
-        int[] yPoints1 = {(int)(y + 5 * scale), (int)(y + 5 * scale), (int)(y - 20 * scale)};
-        g.fillPolygon(xPoints1, yPoints1, 3);
-        
-        // Layer 2 (middle)
-        int[] xPoints2 = {(int)(x - 15 * scale), (int)(x + 15 * scale), (int)x};
-        int[] yPoints2 = {(int)(y - 10 * scale), (int)(y - 10 * scale), (int)(y - 35 * scale)};
-        g.fillPolygon(xPoints2, yPoints2, 3);
-        
-        // Layer 3 (top) - narrowest
-        int[] xPoints3 = {(int)(x - 10 * scale), (int)(x + 10 * scale), (int)x};
-        int[] yPoints3 = {(int)(y - 25 * scale), (int)(y - 25 * scale), (int)(y - 45 * scale)};
-        g.fillPolygon(xPoints3, yPoints3, 3);
-        
-        // Darker shade on left side for depth
-        g.setColor(new Color(20, 80, 30));
-        int[] shadowX = {(int)(x - 20 * scale), (int)x, (int)(x - 5 * scale)};
-        int[] shadowY = {(int)(y + 5 * scale), (int)(y - 20 * scale), (int)(y - 5 * scale)};
-        g.fillPolygon(shadowX, shadowY, 3);
-    }
-    
+
     private void drawDetailedRoad(Graphics g, boolean isNight) {
         Graphics2D g2d = (Graphics2D) g;
         
@@ -532,87 +404,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    private void drawNightForest(Graphics g) {
-        // Define tree positions that repeat
-        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950};
-        int[] treeHeight = {80, 100, 90, 110, 85, 95, 100, 90, 110, 85, 95, 100, 90, 85, 100, 95, 90, 110, 85, 95};
-        
-        for (int i = 0; i < treeX.length; i++) {
-            int scrolledX = (treeX[i] - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            
-            // Draw current position
-            drawTree(g, scrolledX, GROUND_Y - 80, treeHeight[i]);
-            
-            // Draw wrapped version if needed
-            if (scrolledX < WIDTH) {
-                int wrappedX = scrolledX + 3200;
-                if (wrappedX < WIDTH) {
-                    drawTree(g, wrappedX, GROUND_Y - 80, treeHeight[i]);
-                }
-            }
-        }
-        
-        // Draw background forest layer
-        g.setColor(new Color(15, 60, 30));
-        int[] bgTreeX = {50, 200, 350, 500, 650, 800, 950, 1100, 1250, 1400, 1550, 1700, 1850, 2000, 2150, 2300, 2450, 2600, 2750, 2900, 3050};
-        int[] bgTreeHeight = {50, 60, 55, 65, 50, 60, 55, 65, 50, 60, 55, 65, 50, 60, 55, 65, 50, 60, 55, 65, 50};
-        
-        for (int i = 0; i < bgTreeX.length; i++) {
-            int scrolledX = (bgTreeX[i] - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            
-            drawBackgroundTree(g, scrolledX, GROUND_Y - 120, bgTreeHeight[i]);
-            
-            if (scrolledX < WIDTH) {
-                int wrappedX = scrolledX + 3200;
-                if (wrappedX < WIDTH) {
-                    drawBackgroundTree(g, wrappedX, GROUND_Y - 120, bgTreeHeight[i]);
-                }
-            }
-        }
-    }
-
-    private void drawTree(Graphics g, int x, int y, int height) {
-        // Draw trunk
-        g.setColor(new Color(60, 40, 20));
-        g.fillRect(x + 5, y - height + 30, 10, height - 30);
-        
-        // Draw foliage (triangle)
-        g.setColor(new Color(20, 80, 40));
-        int[] xPoints = {x, x + 20, x + 10};
-        int[] yPoints = {y - height + 30, y - height + 30, y - height};
-        ((Graphics2D) g).fillPolygon(xPoints, yPoints, 3);
-        
-        // Add depth with darker shade
-        g.setColor(new Color(10, 50, 25));
-        int[] xPoints2 = {x + 3, x + 17, x + 10};
-        int[] yPoints2 = {y - height + 40, y - height + 40, y - height + 5};
-        ((Graphics2D) g).fillPolygon(xPoints2, yPoints2, 3);
-    }
-
-    private void drawBackgroundTree(Graphics g, int x, int y, int height) {
-        // Smaller trees for background
-        g.fillRect(x + 3, y - height + 20, 6, height - 20);
-        
-        int[] xPoints = {x, x + 12, x + 6};
-        int[] yPoints = {y - height + 20, y - height + 20, y - height};
-        ((Graphics2D) g).fillPolygon(xPoints, yPoints, 3);
-    }
-
     @Override
     public void keyPressed(KeyEvent e) {
         if (!gameOver) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 player.jump();
+            } else if (e.getKeyCode() == KeyEvent.VK_W) {
+                player.moveUp();
+            } else if (e.getKeyCode() == KeyEvent.VK_S) {
+                player.moveDown();
             } else if (e.getKeyCode() == KeyEvent.VK_P) {
                 isPaused = !isPaused;
             } else if (e.getKeyCode() == KeyEvent.VK_Q && isPaused) {
-                // Quit from pause menu - restart the game
                 System.exit(0);
             }
         } else {
@@ -702,4 +505,123 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         x = (WIDTH - fm.stringWidth(quitText)) / 2;
         g.drawString(quitText, x, 450);
     }
+    
+    private void initializeClouds() {
+        // Initialize clouds with predefined positions for parallax effect
+        // These positions repeat across the 3200-pixel game cycle
+        int[] cloudX = {100, 200, 300, 420, 550, 600, 700, 850, 950, 1050, 1150, 1300, 1400, 1550, 1700, 1850, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000};
+        int[] cloudY = {80, 140, 160, 120, 100, 140, 100, 130, 80, 150, 110, 90, 140, 100, 120, 80, 150, 110, 90, 140, 100, 120, 150, 80};
+        int[] cloudW = {80, 60, 50, 100, 70, 90, 90, 70, 80, 60, 100, 90, 70, 80, 100, 90, 70, 80, 100, 90, 70, 80, 90, 100};
+        int[] cloudH = {40, 30, 25, 45, 35, 42, 42, 38, 40, 30, 45, 42, 35, 40, 45, 42, 35, 40, 45, 42, 35, 40, 42, 45};
+        
+        for (int i = 0; i < cloudX.length; i++) {
+            clouds.add(new Cloud(cloudX[i], cloudY[i], cloudW[i], cloudH[i]));
+        }
+    }
+    
+    private void updateCloudPositions() {
+        // Update cloud positions based on background scrolling
+        int[] cloudX = {100, 200, 300, 420, 550, 600, 700, 850, 950, 1050, 1150, 1300, 1400, 1550, 1700, 1850, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000};
+        
+        for (int i = 0; i < clouds.size(); i++) {
+            int baseX = cloudX[i];
+            int scrolledX = (baseX - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            clouds.get(i).setX(scrolledX);
+        }
+    }
+    
+    private void initializeRailings() {
+        // Initialize railings with predefined positions
+        // These positions repeat across the 3200-pixel game cycle
+        int[] railingX = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100};
+        int railingY = GROUND_Y - 105;
+        int railingW = 80;
+        int railingH = 25;
+        
+        for (int i = 0; i < railingX.length; i++) {
+            railings.add(new Railing(railingX[i], railingY, railingW, railingH));
+        }
+    }
+    
+    private void updateRailingPositions() {
+        // Update railing positions based on background scrolling
+        int[] railingX = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100};
+        
+        for (int i = 0; i < railings.size(); i++) {
+            int baseX = railingX[i];
+            int scrolledX = (baseX - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            railings.get(i).setX(scrolledX);
+        }
+    }
+    
+    private void initializeFlags() {
+        // Initialize flags with predefined positions and colors
+        int[] flagX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
+        int flagY = 130;
+        int flagW = 50;
+        int flagH = 30;
+        
+        Color[] flagColors = {
+            new Color(255, 0, 0),       // Red
+            new Color(0, 0, 255),       // Blue
+            new Color(255, 255, 0),     // Yellow
+            new Color(0, 255, 0),       // Green
+            new Color(255, 165, 0),     // Orange
+            new Color(128, 0, 128),     // Purple
+            new Color(255, 192, 203),   // Pink
+            new Color(0, 255, 255),     // Cyan
+        };
+        
+        for (int i = 0; i < flagX.length; i++) {
+            Color flagColor = flagColors[i % flagColors.length];
+            flags.add(new Flag(flagX[i], flagY, flagW, flagH, flagColor));
+        }
+    }
+    
+    private void updateFlagPositions() {
+        // Update flag positions based on background scrolling
+        int[] flagX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
+        
+        for (int i = 0; i < flags.size(); i++) {
+            int baseX = flagX[i];
+            int scrolledX = (baseX - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            flags.get(i).setX(scrolledX);
+        }
+    }
+    
+    private void initializeTrees() {
+        // Initialize trees for both day and night modes
+        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
+        int[] treeY = {GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 85, GROUND_Y - 90, GROUND_Y - 88, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85};
+        int treeW = 50;
+        int treeH = 80;
+        
+        for (int i = 0; i < treeX.length; i++) {
+            trees.add(new Tree(treeX[i], treeY[i], treeW, treeH, true)); // true = night tree, will use tree-night.png in night mode
+        }
+    }
+    
+    private void updateTreePositions() {
+        // Update tree positions based on background scrolling
+        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
+        
+        for (int i = 0; i < trees.size(); i++) {
+            int baseX = treeX[i];
+            int scrolledX = (baseX - backgroundOffset) % 3200;
+            if (scrolledX < 0) {
+                scrolledX += 3200;
+            }
+            trees.get(i).setX(scrolledX);
+        }
+    }
 }
+

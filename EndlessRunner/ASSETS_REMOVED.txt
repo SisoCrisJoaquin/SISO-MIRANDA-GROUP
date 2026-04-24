@@ -1,0 +1,99 @@
+====================================================================
+                    HARDCODED ASSETS REMOVED
+====================================================================
+
+The following hardcoded graphic designs have been removed from the code
+and replaced with image-based rendering for customization.
+
+REMOVED ASSETS:
+===============
+
+1. OBSTACLE ROCKS (Previously in Obstacle.java)
+   - Removed: Detailed rock/boulder graphics with:
+     * Multiple dark gray ovals for layered effect
+     * Rock shadows for depth
+     * Rock highlights for shading
+     * Small pebbles stacked effect
+     * Highlight on top rock
+     * Small pebbles around main rock
+     * Rock texture details (cracks)
+   
+   - Replacement: Image-based rendering from "obstacle.png"
+   - How to customize:
+     * Create/provide a PNG image named "obstacle.png" in the resources/ folder
+     * Image size should be approximately 40x50 pixels (for default size)
+     * If image is missing, no obstacle will render (blank space)
+
+
+2. CLOUD GRAPHICS (Previously in GamePanel.java)
+   - Removed: drawClouds() and drawCloud() methods with:
+     * Hardcoded cloud positions and sizes (24 cloud instances)
+     * Fluffy cloud effect using multiple overlapping circles
+     * White and gray colored ovals with transparency
+     * Parallax scrolling with wrapping effect
+   
+   - Replacement: Cloud.java class with image-based rendering
+   - How to customize:
+     * Create/provide a PNG image named "cloud.png" in the resources/ folder
+     * Each cloud sprite will use the same image size as defined
+     * Cloud positions remain the same; only the visual appearance changes
+     * If image is missing, no clouds will render (blank sky)
+
+
+CUSTOMIZATION GUIDE:
+====================
+
+To add your own sprites:
+
+1. Create PNG image files for each asset:
+   - obstacle.png  (for game obstacles)
+   - cloud.png     (for background clouds)
+
+2. Place these files in the "resources/" folder:
+   c:\Users\John Paul\Downloads\Endless runner game\SISO-MIRANDA-GROUP\EndlessRunner\resources\
+
+3. The game automatically loads and displays these images
+   - If an image is not found, that element simply won't render
+   - Check the console output for any loading errors
+
+4. Recommended image specifications:
+   - Format: PNG (with or without transparency)
+   - obstacle.png: ~40x50 pixels
+   - cloud.png: ~60-80 pixels wide (flexible height)
+   - Use transparent backgrounds (PNG with alpha channel)
+
+
+TECHNICAL DETAILS:
+==================
+
+- ImageLoader.java: Handles all image loading with caching
+  * Searches resources/ folder first
+  * Falls back to JAR resources if not found
+  * Prints error messages if images cannot be loaded
+
+- Cloud.java: New class manages cloud positioning and rendering
+  * Handles parallax scrolling
+  * Maintains consistent positioning across game cycles
+  * Image-based rendering only (no fallback shapes)
+
+- Obstacle.java: Modified to render images only
+  * No fallback drawing of rocks
+  * Requires obstacle.png for obstacles to appear
+
+
+WHAT STILL RENDERS (Not Removed):
+==================================
+
+The following background elements still use hardcoded graphics:
+- Railings (horizontal and vertical rails)
+- Flags (colorful flag poles)
+- Trees (night mode forest)
+- Road/platform
+- Sky gradients and transitions
+- Day/night cycle
+
+These can be converted to image-based assets in future updates.
+
+====================================================================
+                       END OF REPORT
+====================================================================
