@@ -99,29 +99,6 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
         g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
 
-        // Draw Start button
-        int buttonWidth = (int)(WIDTH * 0.25);
-        int buttonHeight = (int)(HEIGHT * 0.08);
-        int buttonX = (WIDTH - buttonWidth) / 2;
-        int buttonY = (int)(HEIGHT * 0.38);
-        startButtonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
-        
-        // Draw button background
-        g2d.setColor(new Color(50, 150, 50));
-        g2d.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-        g2d.setColor(Color.WHITE);
-        g2d.setStroke(new BasicStroke(3));
-        g2d.drawRect(buttonX, buttonY, buttonWidth, buttonHeight);
-        
-        // Draw button text
-        g.setFont(new Font("Arial", Font.BOLD, startFontSize));
-        String buttonText = "START GAME";
-        fm = g.getFontMetrics();
-        int btnX = buttonX + (buttonWidth - fm.stringWidth(buttonText)) / 2;
-        int btnY = buttonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
-        g.setColor(Color.WHITE);
-        g.drawString(buttonText, btnX, btnY);
-
         // Draw objective
         g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));
         g.setColor(new Color(255, 220, 100));
@@ -168,10 +145,6 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
-
-    public boolean shouldStartGame() {
-        return startGame;
-    }
 
     public void reset() {
         startGame = false;
