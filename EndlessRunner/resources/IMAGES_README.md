@@ -31,18 +31,18 @@ Place your PNG images in this folder with these exact names:
 **Note:** You can create as many as you want (1-10). Even having just obstacle1.png will work!
 
 #### 4. background.png (Optional)
-**Size:** 800x500 pixels (or wider for smoother scrolling)
+**Size:** Fullscreen width × ~85% of screen height (e.g., 1920×816 at 1080p, or 1600×680 at 900p)
 **Format:** PNG
 **Description:** The scrolling background image for day mode
 **Example:** A landscape, street, sky, or repeating pattern
-**Note:** Should be wider than 800px for seamless parallax scrolling
+**Note:** Should be at least as wide as screen width for seamless parallax scrolling. Game automatically scales to fit.
 
 #### 4b. background-night.png (Optional)
-**Size:** 800x500 pixels (or wider for smoother scrolling)
+**Size:** Fullscreen width × ~85% of screen height (e.g., 1920×816 at 1080p, or 1600×680 at 900p)
 **Format:** PNG
 **Description:** The scrolling background image for night mode
 **Example:** A night landscape, stars, dark sky, or night scene
-**Note:** If not provided, night mode will use a simple dark sky
+**Note:** If not provided, night mode will use a simple dark sky. Game automatically scales to fit.
 
 ### Background Elements (Image-Based)
 
@@ -75,6 +75,21 @@ Place your PNG images in this folder with these exact names:
 **Format:** PNG with transparency
 **Description:** Tree sprites for night mode background
 **Example:** Dark/silhouetted trees, night forest elements
+
+## Game Resolution
+
+The game now runs **fullscreen** on your monitor's native resolution:
+- **Background images:** Auto-scaled to fit screen width × 85% of screen height
+- **Player & obstacles:** Fixed at 140×100 pixels (but scale based on lane depth)
+- **Other elements:** Scale proportionally with screen size
+
+For best results:
+- **1080p (1920×1080):** Background should be 1920×816 pixels
+- **1440p (2560×1440):** Background should be 2560×1088 pixels  
+- **4K (3840×2160):** Background should be 3840×1632 pixels
+- **Custom:** Use width × (height × 0.85) formula
+
+The game automatically scales background images, so slightly off-size images will still work!
 
 ## Customization Quick Start
 

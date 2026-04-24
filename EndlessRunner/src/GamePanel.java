@@ -11,9 +11,10 @@ import javax.swing.Timer;
  * Handles player input, obstacle spawning, collisions, and smooth day/night transitions
  */
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
-    private static final int GROUND_Y = HEIGHT - 100;
+    private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private static final int WIDTH = screenSize.width;
+    private static final int HEIGHT = screenSize.height;
+    private static final int GROUND_Y = (int)(HEIGHT * 0.85); // 85% down from top for ground
     private static final int OBSTACLE_SPAWN_RATE = 100; // Frames between obstacle spawns
     private static final int BASE_SPEED = 8;
 
@@ -62,9 +63,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         initializeFlags();
         initializeTrees();
         
-        // Try to load background images
-        backgroundImage = ImageLoader.loadImage("/background.png");
-        backgroundNightImage = ImageLoader.loadImage("/background-night.png");
+        // Try to load and scale background images
+        backgroundImage = ImageLoader.loadAndScaleBackgroundImage("/background.png", WIDTH, GROUND_Y);
+        backgroundNightImage = ImageLoader.loadAndScaleBackgroundImage("/background-night.png", WIDTH, GROUND_Y);
         useBackgroundImage = (backgroundImage != null || backgroundNightImage != null);
 
         gameTimer = new javax.swing.Timer(30, this);

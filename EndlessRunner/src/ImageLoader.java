@@ -1,4 +1,5 @@
 import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -77,5 +78,26 @@ public class ImageLoader {
      */
     public static int getCacheSize() {
         return imageCache.size();
+    }
+    
+    /**
+     * Load and scale a background image to fit screen dimensions
+     * @param path The path to the image
+     * @param targetWidth Target width for the background
+     * @param targetHeight Target height for the background
+     * @return Scaled BufferedImage, or null if unable to load
+     */
+    public static BufferedImage loadAndScaleBackgroundImage(String path, int targetWidth, int targetHeight) {
+        BufferedImage original = loadImage(path);
+        if (original == null) return null;
+        
+        // Create scaled image that maintains aspect ratio
+        BufferedImage scaled = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = scaled.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.drawImage(original, 0, 0, targetWidth, targetHeight, null);
+        g2d.dispose();
+        
+        return scaled;
     }
 }

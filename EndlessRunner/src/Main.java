@@ -11,6 +11,7 @@ public class Main {
         JFrame frame = new JFrame("Endless Runner");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
+        frame.setUndecorated(true); // Fullscreen
         
         // Create panels
         MenuPanel menuPanel = new MenuPanel();
@@ -23,8 +24,10 @@ public class Main {
         
         frame.add(container);
         frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        
+        // Set fullscreen
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        gd.setFullScreenWindow(frame);
         
         // Game loop to check if user wants to start
         Timer menuTimer = new Timer(50, e -> {
