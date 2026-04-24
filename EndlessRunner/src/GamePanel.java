@@ -414,7 +414,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 player.moveUp();
             } else if (e.getKeyCode() == KeyEvent.VK_S) {
                 player.moveDown();
-            } else if (e.getKeyCode() == KeyEvent.VK_P) {
+            } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 isPaused = !isPaused;
             } else if (e.getKeyCode() == KeyEvent.VK_Q && isPaused) {
                 System.exit(0);

@@ -26,7 +26,7 @@ A fun and addictive endless runner game built in pure Java using Swing!
 - **SPACEBAR** - Jump over obstacles / Start game from menu
 - **W** - Move up to top lane (gets smaller for 3D effect)
 - **S** - Move down to bottom lane (gets larger for 3D effect)
-- **P** - Pause/Unpause game during gameplay
+- **ESC** - Pause/Unpause game during gameplay
 - **R** - Restart game (when game over)
 - **Q** - Quit to menu (when paused) or quit game (when game over)
 

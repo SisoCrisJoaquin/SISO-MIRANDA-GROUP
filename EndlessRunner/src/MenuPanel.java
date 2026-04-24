@@ -79,7 +79,7 @@ public class MenuPanel extends JPanel implements KeyListener {
         
         g.drawString("SPACEBAR - Jump", leftMargin, controlY);
         g.drawString("W / S - Change Lane", leftMargin, controlY + controlSpacing);
-        g.drawString("P - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
+        g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
         g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
 
         // Draw objective
