@@ -10,7 +10,7 @@ import javax.swing.Timer;
  * Main game loop and rendering engine
  * Handles player input, obstacle spawning, collisions, and smooth day/night transitions
  */
-public class GamePanel extends JPanel implements KeyListener, ActionListener {
+public class GamePanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private static final int WIDTH = screenSize.width;
     private static final int HEIGHT = screenSize.height;
@@ -36,12 +36,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private BufferedImage backgroundNightImage;
     private boolean useBackgroundImage;
     private boolean isPaused = false;
+    private Rectangle continueButtonRect; // Pause menu buttons
+    private Rectangle mainMenuButtonRect;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.WHITE);
         setFocusable(true);
         addKeyListener(this);
+        addMouseListener(this);
 
         player = new Player(GROUND_Y, WIDTH);
         scoreboard = new Scoreboard();
@@ -436,6 +439,30 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void keyTyped(KeyEvent e) {
     }
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // Handle pause menu button clicks
+        if (isPaused && !gameOver) {
+            if (continueButtonRect != null && continueButtonRect.contains(e.getPoint())) {
+                isPaused = false;
+            } else if (mainMenuButtonRect != null && mainMenuButtonRect.contains(e.getPoint())) {
+                System.exit(0); // Exit to main menu
+            }
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
     private void restartGame() {
         player.reset(GROUND_Y, WIDTH);
         scoreboard.reset();
@@ -469,6 +496,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     }
     
     private void drawPauseMenu(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        
         // Dark overlay
         g.setColor(new Color(0, 0, 0, 200));
         g.fillRect(0, 0, WIDTH, HEIGHT);
@@ -494,17 +523,48 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         x = (WIDTH - fm.stringWidth(livesText)) / 2;
         g.drawString(livesText, x, 310);
         
-        // Instructions
-        g.setFont(new Font("Arial", Font.PLAIN, 28));
-        String continueText = "Press 'P' to Continue";
-        fm = g.getFontMetrics();
-        x = (WIDTH - fm.stringWidth(continueText)) / 2;
-        g.drawString(continueText, x, 400);
+        // Draw Continue button
+        int buttonWidth = (int)(WIDTH * 0.25);
+        int buttonHeight = (int)(HEIGHT * 0.08);
+        int buttonX = (WIDTH - buttonWidth) / 2;
+        int buttonY = 380;
+        continueButtonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
         
-        String quitText = "Press 'Q' to Main Menu";
+        // Draw button background
+        g2d.setColor(new Color(50, 150, 50));
+        g2d.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Draw button text
+        g.setFont(new Font("Arial", Font.BOLD, 28));
+        String btnText = "CONTINUE";
         fm = g.getFontMetrics();
-        x = (WIDTH - fm.stringWidth(quitText)) / 2;
-        g.drawString(quitText, x, 450);
+        int btnX = buttonX + (buttonWidth - fm.stringWidth(btnText)) / 2;
+        int btnY = buttonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(btnText, btnX, btnY);
+        
+        // Draw Main Menu button
+        int menuButtonY = buttonY + buttonHeight + 20;
+        mainMenuButtonRect = new Rectangle(buttonX, menuButtonY, buttonWidth, buttonHeight);
+        
+        // Draw button background
+        g2d.setColor(new Color(150, 50, 50));
+        g2d.fillRect(buttonX, menuButtonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, menuButtonY, buttonWidth, buttonHeight);
+        
+        // Draw button text
+        g.setFont(new Font("Arial", Font.BOLD, 28));
+        String menuText = "MAIN MENU";
+        fm = g.getFontMetrics();
+        btnX = buttonX + (buttonWidth - fm.stringWidth(menuText)) / 2;
+        btnY = menuButtonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(menuText, btnX, btnY);
     }
     
     private void initializeClouds() {

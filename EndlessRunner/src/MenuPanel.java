@@ -7,17 +7,19 @@ import javax.swing.*;
  * Main menu screen displayed at game start
  * Shows game title, instructions, and controls
  */
-public class MenuPanel extends JPanel implements KeyListener {
+public class MenuPanel extends JPanel implements KeyListener, MouseListener {
     private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private static final int WIDTH = screenSize.width;
     private static final int HEIGHT = screenSize.height;
     private boolean startGame = false;
+    private Rectangle startButtonRect; // Button for clicking
 
     public MenuPanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(135, 206, 235)); // Light blue background
         setFocusable(true);
         addKeyListener(this);
+        addMouseListener(this);
     }
 
     @Override
@@ -54,13 +56,28 @@ public class MenuPanel extends JPanel implements KeyListener {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRect(x - 20, titleY - fm.getAscent(), fm.stringWidth(title) + 40, fm.getAscent() + fm.getDescent() + 10);
 
-        // Draw instructions
+        // Draw Start button
+        int buttonWidth = (int)(WIDTH * 0.25);
+        int buttonHeight = (int)(HEIGHT * 0.08);
+        int buttonX = (WIDTH - buttonWidth) / 2;
+        int buttonY = (int)(HEIGHT * 0.38);
+        startButtonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Draw button background
+        g2d.setColor(new Color(50, 150, 50));
+        g2d.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Draw button text
         g.setFont(new Font("Arial", Font.BOLD, startFontSize));
-        String startText = "Press SPACEBAR to Start";
+        String buttonText = "START GAME";
         fm = g.getFontMetrics();
-        x = (WIDTH - fm.stringWidth(startText)) / 2;
+        int btnX = buttonX + (buttonWidth - fm.stringWidth(buttonText)) / 2;
+        int btnY = buttonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
         g.setColor(Color.WHITE);
-        g.drawString(startText, x, (int)(HEIGHT * 0.35));
+        g.drawString(buttonText, btnX, btnY);
 
         // Draw how to play section
         g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));
@@ -81,6 +98,29 @@ public class MenuPanel extends JPanel implements KeyListener {
         g.drawString("W / S - Change Lane", leftMargin, controlY + controlSpacing);
         g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
         g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
+
+        // Draw Start button
+        int buttonWidth = (int)(WIDTH * 0.25);
+        int buttonHeight = (int)(HEIGHT * 0.08);
+        int buttonX = (WIDTH - buttonWidth) / 2;
+        int buttonY = (int)(HEIGHT * 0.38);
+        startButtonRect = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Draw button background
+        g2d.setColor(new Color(50, 150, 50));
+        g2d.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Draw button text
+        g.setFont(new Font("Arial", Font.BOLD, startFontSize));
+        String buttonText = "START GAME";
+        fm = g.getFontMetrics();
+        int btnX = buttonX + (buttonWidth - fm.stringWidth(buttonText)) / 2;
+        int btnY = buttonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(buttonText, btnX, btnY);
 
         // Draw objective
         g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));
@@ -105,6 +145,29 @@ public class MenuPanel extends JPanel implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
     }
+
+    public boolean shouldStartGame() {
+        return startGame;
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (startButtonRect != null && startButtonRect.contains(e.getPoint())) {
+            startGame = true;
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 
     public boolean shouldStartGame() {
         return startGame;
