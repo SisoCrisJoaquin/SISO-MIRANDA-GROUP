@@ -22,6 +22,7 @@ public class Player {
     private final float GRAVITY = 0.6f;
     private final int MAX_FALL_SPEED = 18;
     private final int LANE_HEIGHT = 40; // Vertical distance between lanes
+    private final int RETURN_SPEED = 5; // Speed to gradually return to standard X position
     private final BufferedImage playerImage;
     private final boolean useImage;
 
@@ -106,10 +107,18 @@ public class Player {
             
             if (y >= laneGroundY) {
                 y = laneGroundY;
-                x = standardX; // Snap back to starting x position when landing
                 isJumping = false;
                 velocityY = 0;
                 velocityX = 0;
+            }
+        } else {
+            // Gradually return to standard X position when not jumping
+            if (x < standardX) {
+                x += RETURN_SPEED;
+                if (x > standardX) x = standardX; // Don't overshoot
+            } else if (x > standardX) {
+                x -= RETURN_SPEED;
+                if (x < standardX) x = standardX; // Don't overshoot
             }
         }
     }
