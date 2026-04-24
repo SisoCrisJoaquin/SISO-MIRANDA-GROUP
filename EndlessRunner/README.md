@@ -6,6 +6,8 @@ A fun and addictive endless runner game built in pure Java using Swing!
 
 ✅ **Smooth Day/Night Transitions** - Beautiful continuous color blending every 1000 points  
 ✅ **3-Lane System** - Switch between top, middle, and bottom lanes with W/S keys for depth perception  
+✅ **Fullscreen Display** - Game automatically scales to your monitor's resolution  
+✅ **Responsive UI** - Menu and all text scale proportionally to screen size  
 ✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
 ✅ **Pause Menu** - Press P to pause and see your score and lives  
 ✅ **Player with 3 Lives** - Lose all lives and it's game over  
