@@ -8,28 +8,32 @@ import java.awt.image.BufferedImage;
  */
 public class Player {
     private int x;
+    private int standardX; // Starting x position to return to when landing
     private int y;
     private int width;
     private int height;
-    private int velocityY;
+    private float velocityX;
+    private float velocityY;
     private boolean isJumping;
     private int groundY;
     private int lane; // 0 = top, 1 = middle, 2 = bottom
     private float scale; // 1.0 = normal, 0.8 = small (top), 1.2 = large (bottom)
-    private final int JUMP_STRENGTH = 20;
-    private final int GRAVITY = 1;
-    private final int MAX_FALL_SPEED = 25;
+    private final int JUMP_STRENGTH = 18;
+    private final float GRAVITY = 0.6f;
+    private final int MAX_FALL_SPEED = 18;
     private final int LANE_HEIGHT = 40; // Vertical distance between lanes
     private final BufferedImage playerImage;
     private final boolean useImage;
 
     public Player(int groundY, int screenWidth) {
         this.x = screenWidth / 4;
+        this.standardX = screenWidth / 4; // Store standard position
         this.groundY = groundY;
         this.lane = 1; // Start in middle lane
         this.scale = 1.0f;
         this.width = 140;
         this.height = 100;
+        this.velocityX = 0;
         this.velocityY = 0;
         this.isJumping = false;
         updateLanePosition();
@@ -80,11 +84,15 @@ public class Player {
 
     public void update() {
         if (isJumping) {
+            // Apply gravity and horizontal friction for arc motion
             velocityY += GRAVITY;
             if (velocityY > MAX_FALL_SPEED) {
                 velocityY = MAX_FALL_SPEED;
             }
+            velocityX *= 0.92f;  // Friction to reduce horizontal velocity over time
+            
             y += velocityY;
+            x += (int)velocityX;
 
             // Get the ground level for the current lane
             int laneGroundY;
@@ -98,8 +106,10 @@ public class Player {
             
             if (y >= laneGroundY) {
                 y = laneGroundY;
+                x = standardX; // Snap back to starting x position when landing
                 isJumping = false;
                 velocityY = 0;
+                velocityX = 0;
             }
         }
     }
@@ -107,6 +117,7 @@ public class Player {
     public void jump() {
         if (!isJumping) {
             velocityY = -JUMP_STRENGTH;
+            velocityX = 8.0f;  // Horizontal velocity for wider arc
             isJumping = true;
         }
     }
@@ -138,9 +149,11 @@ public class Player {
 
     public void reset(int groundY, int screenWidth) {
         this.x = screenWidth / 4;
+        this.standardX = screenWidth / 4; // Reset to standard position
         this.groundY = groundY;
         this.lane = 1;
         this.scale = 1.0f;
+        this.velocityX = 0;
         this.velocityY = 0;
         this.isJumping = false;
         updateLanePosition();

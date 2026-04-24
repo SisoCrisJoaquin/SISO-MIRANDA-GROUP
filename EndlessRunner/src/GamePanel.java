@@ -15,7 +15,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private static final int HEIGHT = 600;
     private static final int GROUND_Y = HEIGHT - 100;
     private static final int OBSTACLE_SPAWN_RATE = 100; // Frames between obstacle spawns
-    private static final int BASE_SPEED = 5;
+    private static final int BASE_SPEED = 8;
 
     private Player player;
     private Scoreboard scoreboard;
@@ -225,8 +225,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             // Update sky based on score
             updateSkyColor();
 
-            // Increase speed slightly as score increases
-            currentSpeed = BASE_SPEED + (scoreboard.getScore() / 200);
+            // Increase speed with faster progression (obstacles get faster quicker)
+            currentSpeed = BASE_SPEED + (scoreboard.getScore() / 150);
 
             repaint();
         } else if (!gameOver && isPaused) {
