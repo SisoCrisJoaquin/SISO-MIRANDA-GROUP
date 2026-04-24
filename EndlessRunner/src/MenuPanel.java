@@ -13,6 +13,8 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
     private static final int HEIGHT = screenSize.height;
     private boolean startGame = false;
     private Rectangle startButtonRect; // Button for clicking
+    private Rectangle howToPlayButtonRect; // How to Play button
+    private boolean showControls = false; // Toggle for showing controls
 
     public MenuPanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -79,25 +81,42 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         g.setColor(Color.WHITE);
         g.drawString(buttonText, btnX, btnY);
 
-        // Draw how to play section
-        g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));
-        g.setColor(new Color(255, 255, 200));
-        String howToPlay = "HOW TO PLAY";
-        fm = g.getFontMetrics();
-        x = (WIDTH - fm.stringWidth(howToPlay)) / 2;
-        g.drawString(howToPlay, x, (int)(HEIGHT * 0.48));
-
-        // Draw controls
-        g.setFont(new Font("Arial", Font.PLAIN, controlFontSize));
-        g.setColor(Color.WHITE);
-        int leftMargin = (int)(WIDTH * 0.15);
-        int controlY = (int)(HEIGHT * 0.55);
-        int controlSpacing = (int)(HEIGHT * 0.05);
+        // Draw How To Play button
+        int howButtonWidth = (int)(WIDTH * 0.2);
+        int howButtonHeight = (int)(HEIGHT * 0.06);
+        int howButtonX = (WIDTH - howButtonWidth) / 2;
+        int howButtonY = (int)(HEIGHT * 0.50);
+        howToPlayButtonRect = new Rectangle(howButtonX, howButtonY, howButtonWidth, howButtonHeight);
         
-        g.drawString("SPACEBAR - Jump", leftMargin, controlY);
-        g.drawString("W / S - Change Lane", leftMargin, controlY + controlSpacing);
-        g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
-        g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
+        // Draw button background
+        g2d.setColor(new Color(70, 120, 180));
+        g2d.fillRect(howButtonX, howButtonY, howButtonWidth, howButtonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(howButtonX, howButtonY, howButtonWidth, howButtonHeight);
+        
+        // Draw button text
+        g.setFont(new Font("Arial", Font.BOLD, (int)(sectionFontSize * 0.9)));
+        String howText = showControls ? "HIDE CONTROLS" : "HOW TO PLAY";
+        fm = g.getFontMetrics();
+        int howX = howButtonX + (howButtonWidth - fm.stringWidth(howText)) / 2;
+        int howY = howButtonY + ((howButtonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(howText, howX, howY);
+
+        // Draw controls only if showControls is true
+        if (showControls) {
+            g.setFont(new Font("Arial", Font.PLAIN, controlFontSize));
+            g.setColor(Color.WHITE);
+            int leftMargin = (int)(WIDTH * 0.15);
+            int controlY = (int)(HEIGHT * 0.58);
+            int controlSpacing = (int)(HEIGHT * 0.05);
+            
+            g.drawString("SPACEBAR - Jump", leftMargin, controlY);
+            g.drawString("W / S - Change Lane", leftMargin, controlY + controlSpacing);
+            g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
+            g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
+        }
 
         // Draw objective
         g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));
@@ -131,6 +150,9 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
     public void mousePressed(MouseEvent e) {
         if (startButtonRect != null && startButtonRect.contains(e.getPoint())) {
             startGame = true;
+        } else if (howToPlayButtonRect != null && howToPlayButtonRect.contains(e.getPoint())) {
+            showControls = !showControls;
+            repaint();
         }
     }
 
@@ -148,5 +170,6 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
 
     public void reset() {
         startGame = false;
+        showControls = false;
     }
 }
