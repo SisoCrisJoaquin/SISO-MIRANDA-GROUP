@@ -21,10 +21,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private Player player;
     private Scoreboard scoreboard;
     private ArrayList<Obstacle> obstacles;
-    private ArrayList<Cloud> clouds;
-    private ArrayList<Railing> railings;
-    private ArrayList<Flag> flags;
-    private ArrayList<Tree> trees;
     private Timer gameTimer;
     private int obstacleSpawnCounter;
     private int currentSpeed;
@@ -50,22 +46,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         player = new Player(GROUND_Y, WIDTH);
         scoreboard = new Scoreboard();
         obstacles = new ArrayList<>();
-        clouds = new ArrayList<>();
-        railings = new ArrayList<>();
-        flags = new ArrayList<>();
-        trees = new ArrayList<>();
         obstacleSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         gameOver = false;
         backgroundOffset = 0;
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
-        
-        // Initialize clouds, railings, flags, and trees
-        initializeClouds();
-        initializeRailings();
-        initializeFlags();
-        initializeTrees();
         
         // Try to load and scale background images
         backgroundImage = ImageLoader.loadAndScaleBackgroundImage("/background.png", WIDTH, GROUND_Y);
@@ -96,11 +82,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                     backgroundImage = backgroundNightImage;
                     drawBackgroundImage(g2d);
                 }
-                
-                // Draw trees
-                for (Tree tree : trees) {
-                    tree.draw(g);
-                }
             } else {
                 // Draw day background
                 if (backgroundImage != null) {
@@ -108,20 +89,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 } else {
                     g.setColor(skyColor);
                     g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
-
-                    for (Cloud cloud : clouds) {
-                        cloud.draw(g);
-                    }
-                    
-                    for (Railing railing : railings) {
-                        railing.draw(g);
-                    }
-                    
-                    for (Flag flag : flags) {
-                        flag.draw(g);
-                    }
                 }
             }
+
+            // Draw road track platform
+            drawDetailedRoad(g, isNightMode);
 
             // Draw by lane for proper depth layering
             // Lane 0 (top/furthest) -> Lane 1 (middle) -> Lane 2 (bottom/closest)
@@ -218,14 +190,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             if (backgroundOffset > 3200) {
                 backgroundOffset -= 3200;
             }
-            
-            // Update cloud positions
-            updateCloudPositions();
-            
-            // Update railing, flag, and tree positions
-            updateRailingPositions();
-            updateFlagPositions();
-            updateTreePositions();
 
             // Update sky based on score
             updateSkyColor();
@@ -332,11 +296,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         g.setColor(new Color(25, 35, 65)); // Dark blue night sky
         g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
         drawStars(g);
-        
-        // Draw trees from tree list (image-based)
-        for (Tree tree : trees) {
-            tree.draw(g);
-        }
         
         // Draw detailed road platform for night
         drawDetailedRoad(g, true);
@@ -569,121 +528,35 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     }
     
     private void initializeClouds() {
-        // Initialize clouds with predefined positions for parallax effect
-        // These positions repeat across the 3200-pixel game cycle
-        int[] cloudX = {100, 200, 300, 420, 550, 600, 700, 850, 950, 1050, 1150, 1300, 1400, 1550, 1700, 1850, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000};
-        int[] cloudY = {80, 140, 160, 120, 100, 140, 100, 130, 80, 150, 110, 90, 140, 100, 120, 80, 150, 110, 90, 140, 100, 120, 150, 80};
-        int[] cloudW = {80, 60, 50, 100, 70, 90, 90, 70, 80, 60, 100, 90, 70, 80, 100, 90, 70, 80, 100, 90, 70, 80, 90, 100};
-        int[] cloudH = {40, 30, 25, 45, 35, 42, 42, 38, 40, 30, 45, 42, 35, 40, 45, 42, 35, 40, 45, 42, 35, 40, 42, 45};
-        
-        for (int i = 0; i < cloudX.length; i++) {
-            clouds.add(new Cloud(cloudX[i], cloudY[i], cloudW[i], cloudH[i]));
-        }
+        // Method removed - Clouds class no longer used
     }
     
     private void updateCloudPositions() {
-        // Update cloud positions based on background scrolling
-        int[] cloudX = {100, 200, 300, 420, 550, 600, 700, 850, 950, 1050, 1150, 1300, 1400, 1550, 1700, 1850, 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000};
-        
-        for (int i = 0; i < clouds.size(); i++) {
-            int baseX = cloudX[i];
-            int scrolledX = (baseX - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            clouds.get(i).setX(scrolledX);
-        }
+        // Method removed - Clouds class no longer used
     }
     
     private void initializeRailings() {
-        // Initialize railings with predefined positions
-        // These positions repeat across the 3200-pixel game cycle
-        int[] railingX = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100};
-        int railingY = GROUND_Y - 105;
-        int railingW = 80;
-        int railingH = 25;
-        
-        for (int i = 0; i < railingX.length; i++) {
-            railings.add(new Railing(railingX[i], railingY, railingW, railingH));
-        }
+        // Method removed - Railing class no longer used
     }
     
     private void updateRailingPositions() {
-        // Update railing positions based on background scrolling
-        int[] railingX = {0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100};
-        
-        for (int i = 0; i < railings.size(); i++) {
-            int baseX = railingX[i];
-            int scrolledX = (baseX - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            railings.get(i).setX(scrolledX);
-        }
+        // Method removed - Railing class no longer used
     }
     
     private void initializeFlags() {
-        // Initialize flags with predefined positions and colors
-        int[] flagX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        int flagY = 130;
-        int flagW = 50;
-        int flagH = 30;
-        
-        Color[] flagColors = {
-            new Color(255, 0, 0),       // Red
-            new Color(0, 0, 255),       // Blue
-            new Color(255, 255, 0),     // Yellow
-            new Color(0, 255, 0),       // Green
-            new Color(255, 165, 0),     // Orange
-            new Color(128, 0, 128),     // Purple
-            new Color(255, 192, 203),   // Pink
-            new Color(0, 255, 255),     // Cyan
-        };
-        
-        for (int i = 0; i < flagX.length; i++) {
-            Color flagColor = flagColors[i % flagColors.length];
-            flags.add(new Flag(flagX[i], flagY, flagW, flagH, flagColor));
-        }
+        // Method removed - Flag class no longer used
     }
     
     private void updateFlagPositions() {
-        // Update flag positions based on background scrolling
-        int[] flagX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        
-        for (int i = 0; i < flags.size(); i++) {
-            int baseX = flagX[i];
-            int scrolledX = (baseX - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            flags.get(i).setX(scrolledX);
-        }
+        // Method removed - Flag class no longer used
     }
     
     private void initializeTrees() {
-        // Initialize trees for both day and night modes
-        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        int[] treeY = {GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 85, GROUND_Y - 90, GROUND_Y - 88, GROUND_Y - 95, GROUND_Y - 90, GROUND_Y - 85, GROUND_Y - 95, GROUND_Y - 88, GROUND_Y - 90, GROUND_Y - 85};
-        int treeW = 50;
-        int treeH = 80;
-        
-        for (int i = 0; i < treeX.length; i++) {
-            trees.add(new Tree(treeX[i], treeY[i], treeW, treeH, true)); // true = night tree, will use tree-night.png in night mode
-        }
+        // Method removed - Tree class no longer used
     }
     
     private void updateTreePositions() {
-        // Update tree positions based on background scrolling
-        int[] treeX = {100, 250, 400, 550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200, 2350, 2500, 2650, 2800, 2950, 3100};
-        
-        for (int i = 0; i < trees.size(); i++) {
-            int baseX = treeX[i];
-            int scrolledX = (baseX - backgroundOffset) % 3200;
-            if (scrolledX < 0) {
-                scrolledX += 3200;
-            }
-            trees.get(i).setX(scrolledX);
-        }
+        // Method removed - Tree class no longer used
     }
 
     public boolean shouldReturnToMenu() {

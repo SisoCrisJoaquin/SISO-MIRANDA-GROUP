@@ -27,7 +27,7 @@ public class Obstacle {
         this.height = 100;
         this.speed = speed;
         this.lane = lane;
-        this.obstacleType = new Random().nextInt(10) + 1;
+        this.obstacleType = new Random().nextInt(2) + 1;
         
         // Set scale based on lane
         if (lane == 0) {
@@ -41,8 +41,13 @@ public class Obstacle {
             this.y = groundY + LANE_HEIGHT - (int)(height * scale);
         }
         
-        // Try to load the selected obstacle image
-        String obstaclePath = "/obstacle" + obstacleType + ".png";
+        // Randomly select one of the two obstacle images
+        String obstaclePath;
+        if (obstacleType == 1) {
+            obstaclePath = "/rock-clip-art-stone-e1b488d81eb4003e897ce8af1cf28b45.png";
+        } else {
+            obstaclePath = "/l21lsebkvai3v0r9g2mk0trsaq.png";
+        }
         this.obstacleImage = ImageLoader.loadImage(obstaclePath);
         
         if (this.obstacleImage == null) {

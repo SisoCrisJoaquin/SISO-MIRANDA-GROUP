@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 /**
@@ -16,6 +17,8 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
     private Rectangle howToPlayButtonRect; // How to Play button
     private Rectangle exitButtonRect; // Exit button
     private boolean showControls = false; // Toggle for showing controls
+    private BufferedImage wallpaperImage; // Wallpaper for menu background
+    private BufferedImage titleBackgroundImage; // Title background image
 
     public MenuPanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -23,6 +26,12 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         setFocusable(true);
         addKeyListener(this);
         addMouseListener(this);
+        
+        // Load wallpaper image
+        wallpaperImage = ImageLoader.loadAndScaleBackgroundImage("/rider-motorbike-road-riding-having-fun-driving-empty-road.jpg", WIDTH, HEIGHT);
+        
+        // Load title background image
+        titleBackgroundImage = ImageLoader.loadImage("/painting-ink-brush-portable-network-graphics-article-title-364854df596df777851b1411b70b6708.png");
     }
 
     @Override
@@ -31,13 +40,17 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Draw background
-        g.setColor(new Color(135, 206, 235));
-        g.fillRect(0, 0, WIDTH, HEIGHT);
+        // Draw wallpaper background or fallback color
+        if (wallpaperImage != null) {
+            g.drawImage(wallpaperImage, 0, 0, WIDTH, HEIGHT, null);
+        } else {
+            g.setColor(new Color(135, 206, 235));
+            g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        // Draw grass
-        g.setColor(new Color(34, 177, 76));
-        g.fillRect(0, (int)(HEIGHT * 0.85), WIDTH, (int)(HEIGHT * 0.15));
+            // Draw grass fallback
+            g.setColor(new Color(34, 177, 76));
+            g.fillRect(0, (int)(HEIGHT * 0.85), WIDTH, (int)(HEIGHT * 0.15));
+        }
 
         // Calculate responsive font sizes
         int titleFontSize = Math.max(40, WIDTH / 15);
@@ -49,15 +62,30 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, titleFontSize));
         FontMetrics fm = g.getFontMetrics();
-        String title = "ENDLESS RUNNER";
+        String title = "Motorcyclist seeker";
         int x = (WIDTH - fm.stringWidth(title)) / 2;
         int titleY = (int)(HEIGHT * 0.15);
+        
+        // Draw title background image if available
+        if (titleBackgroundImage != null) {
+            int bgPadding = 50;
+            int bgWidth = fm.stringWidth(title) + (bgPadding * 2);
+            int bgHeight = fm.getAscent() + fm.getDescent() + (bgPadding * 2);
+            int bgX = x - bgPadding;
+            int bgY = titleY - fm.getAscent() - bgPadding;
+            g2d.drawImage(titleBackgroundImage, bgX, bgY, bgWidth, bgHeight, null);
+        }
+        
         g.drawString(title, x, titleY);
 
-        // Draw decorative box around title
-        g2d.setColor(new Color(0, 0, 0, 100));
-        g2d.setStroke(new BasicStroke(3));
-        g2d.drawRect(x - 20, titleY - fm.getAscent(), fm.stringWidth(title) + 40, fm.getAscent() + fm.getDescent() + 10);
+        // Draw subtitle/description
+        g.setColor(new Color(200, 200, 255));
+        g.setFont(new Font("Arial", Font.ITALIC, (int)(sectionFontSize * 0.8)));
+        String subtitle = "Endless Runner";
+        fm = g.getFontMetrics();
+        int subtitleX = (WIDTH - fm.stringWidth(subtitle)) / 2;
+        int subtitleY = titleY + (int)(HEIGHT * 0.06);
+        g.drawString(subtitle, subtitleX, subtitleY);
 
         // Draw Start button
         int buttonWidth = (int)(WIDTH * 0.25);
