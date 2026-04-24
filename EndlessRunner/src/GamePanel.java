@@ -38,6 +38,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private boolean isPaused = false;
     private Rectangle continueButtonRect; // Pause menu buttons
     private Rectangle mainMenuButtonRect;
+    private boolean returnToMenu = false; // Flag to return to main menu
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -446,7 +447,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             if (continueButtonRect != null && continueButtonRect.contains(e.getPoint())) {
                 isPaused = false;
             } else if (mainMenuButtonRect != null && mainMenuButtonRect.contains(e.getPoint())) {
-                System.exit(0); // Exit to main menu
+                returnToMenu = true; // Signal to return to main menu
             }
         }
     }
@@ -683,6 +684,25 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             }
             trees.get(i).setX(scrolledX);
         }
+    }
+
+    public boolean shouldReturnToMenu() {
+        return returnToMenu;
+    }
+
+    public void resetGameState() {
+        returnToMenu = false;
+        isPaused = false;
+        gameOver = false;
+        player.reset(GROUND_Y, WIDTH);
+        scoreboard.reset();
+        obstacles.clear();
+        obstacleSpawnCounter = 0;
+        currentSpeed = BASE_SPEED;
+        backgroundOffset = 0;
+        skyColor = new Color(135, 206, 235);
+        updateSkyColor();
+        gameTimer.stop();
     }
 }
 

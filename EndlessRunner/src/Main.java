@@ -29,6 +29,9 @@ public class Main {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
         
+        // Use array wrapper to allow reference in inner class
+        Timer[] menuTimerRef = new Timer[1];
+        
         // Game loop to check if user wants to start
         Timer menuTimer = new Timer(50, e -> {
             if (menuPanel.shouldStartGame()) {
@@ -38,8 +41,23 @@ public class Main {
                 menuPanel.reset();
                 gamePanel.requestFocus();
                 ((Timer) e.getSource()).stop();
+                
+                // Start game monitoring timer to detect return to menu
+                Timer gameTimer = new Timer(50, ev -> {
+                    if (gamePanel.shouldReturnToMenu()) {
+                        // Switch back to menu
+                        CardLayout layout2 = (CardLayout) container.getLayout();
+                        layout2.show(container, "Menu");
+                        gamePanel.resetGameState();
+                        menuPanel.requestFocus();
+                        ((Timer) ev.getSource()).stop();
+                        menuTimerRef[0].start(); // Restart menu timer
+                    }
+                });
+                gameTimer.start();
             }
         });
+        menuTimerRef[0] = menuTimer;
         menuTimer.start();
     }
 }

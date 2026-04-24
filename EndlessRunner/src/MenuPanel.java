@@ -14,6 +14,7 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
     private boolean startGame = false;
     private Rectangle startButtonRect; // Button for clicking
     private Rectangle howToPlayButtonRect; // How to Play button
+    private Rectangle exitButtonRect; // Exit button
     private boolean showControls = false; // Toggle for showing controls
 
     public MenuPanel() {
@@ -125,6 +126,29 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         fm = g.getFontMetrics();
         x = (WIDTH - fm.stringWidth(objective)) / 2;
         g.drawString(objective, x, (int)(HEIGHT * 0.78));
+
+        // Draw Exit button
+        int exitButtonWidth = (int)(WIDTH * 0.15);
+        int exitButtonHeight = (int)(HEIGHT * 0.06);
+        int exitButtonX = (WIDTH - exitButtonWidth) / 2;
+        int exitButtonY = (int)(HEIGHT * 0.88);
+        exitButtonRect = new Rectangle(exitButtonX, exitButtonY, exitButtonWidth, exitButtonHeight);
+        
+        // Draw button background
+        g2d.setColor(new Color(180, 50, 50));
+        g2d.fillRect(exitButtonX, exitButtonY, exitButtonWidth, exitButtonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(exitButtonX, exitButtonY, exitButtonWidth, exitButtonHeight);
+        
+        // Draw button text
+        g.setFont(new Font("Arial", Font.BOLD, (int)(sectionFontSize * 0.9)));
+        String exitText = "EXIT";
+        fm = g.getFontMetrics();
+        int exitX = exitButtonX + (exitButtonWidth - fm.stringWidth(exitText)) / 2;
+        int exitY = exitButtonY + ((exitButtonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(exitText, exitX, exitY);
     }
 
     @Override
@@ -153,6 +177,8 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
         } else if (howToPlayButtonRect != null && howToPlayButtonRect.contains(e.getPoint())) {
             showControls = !showControls;
             repaint();
+        } else if (exitButtonRect != null && exitButtonRect.contains(e.getPoint())) {
+            System.exit(0);
         }
     }
 
