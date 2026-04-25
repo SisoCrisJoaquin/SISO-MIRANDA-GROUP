@@ -41,23 +41,17 @@ public class Obstacle {
             this.y = groundY + LANE_HEIGHT - (int)(height * scale);
         }
         
-        // Randomly select one of the two obstacle images
-        String obstaclePath;
-        if (obstacleType == 1) {
-            obstaclePath = "/rock-clip-art-stone-e1b488d81eb4003e897ce8af1cf28b45.png";
-        } else {
-            obstaclePath = "/l21lsebkvai3v0r9g2mk0trsaq.png";
-        }
-        this.obstacleImage = ImageLoader.loadImage(obstaclePath);
-        
-        if (this.obstacleImage == null) {
-            this.obstacleImage = ImageLoader.loadImage("/obstacle.png");
-        }
+        // Load obstacle image
+        this.obstacleImage = ImageLoader.loadImage("/obstacle.png");
         this.useImage = (obstacleImage != null);
     }
 
     public void update() {
-        x -= speed;
+        update(1.0f);
+    }
+    
+    public void update(float speedMultiplier) {
+        x -= (int)(speed * speedMultiplier);
     }
 
     public void draw(Graphics g) {

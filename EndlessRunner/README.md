@@ -185,6 +185,10 @@ See `ASSETS_REMOVED.txt` for detailed technical information about removed hardco
 - Provides better error handling and colored output
 
 ## Recent Updates
+### Version 3.5 - Menu & Pause System
+-  Nitro boost: The player can now press Shift to boost themselves
+- added player animation to give the illusion of movement
+
 
 ### Version 3.0 - Complete Image-Based Refactor ✨
 - 🎨 **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
@@ -222,6 +226,7 @@ See `ASSETS_REMOVED.txt` for detailed technical information about removed hardco
 - 🎮 **Enhanced UI**: Cleaner game flow with menu-to-game transitions
 - 📋 **MenuPanel.java**: New class for menu rendering and controls
 - 🔄 **Updated Main.java**: Uses CardLayout for smooth menu/game switching
+
 
 ---
 

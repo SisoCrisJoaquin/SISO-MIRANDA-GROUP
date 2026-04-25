@@ -3,6 +3,8 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
+import org.w3c.dom.events.MouseEvent;
+
 /**
  * ========== MENUPANEL.JAVA ==========
  * Main menu screen displayed at game start
@@ -145,7 +147,9 @@ public class MenuPanel extends JPanel implements KeyListener, MouseListener {
             g.drawString("W / S - Change Lane", leftMargin, controlY + controlSpacing);
             g.drawString("ESC - Pause/Unpause", leftMargin, controlY + controlSpacing * 2);
             g.drawString("R - Restart (on Game Over)", leftMargin, controlY + controlSpacing * 3);
+            g.drawString("Shift - Boost", leftMargin, controlY + controlSpacing * 4);
         }
+
 
         // Draw objective
         g.setFont(new Font("Arial", Font.BOLD, sectionFontSize));

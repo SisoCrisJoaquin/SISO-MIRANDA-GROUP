@@ -79,6 +79,15 @@ public class Player {
     private final BufferedImage playerImage;
     private final boolean useImage;
     
+    // Boost mechanics
+    private int boostFuel; // Current boost fuel
+    private int maxBoostFuel = 120; // Maximum fuel (frames)
+    private boolean isBoosting; // Currently using boost
+    private int boostRegenCounter; // Counter for slow regeneration
+    private static final int BOOST_REGEN_RATE = 30; // Regenerate 1 fuel every 30 frames (1 second at 30 FPS)
+    private static final float BOOST_SPEED_MULTIPLIER = 1.5f;
+    private static final int BOOST_JUMP_STRENGTH = 22; // Faster jump when boosting
+    
     // Wind trail VFX properties
     private ArrayList<WindTrailParticle> windTrails;
     private int windTrailSpawnCounter;
@@ -90,6 +99,16 @@ public class Player {
     private final int LANE_TRANSITION_DURATION = 10; // Frames for lane change animation
     private final int JUMP_ANIMATION_DURATION = 20; // Frames for jump animation
     private int previousLane; // Track lane before animation started
+    
+    // Animation frame properties
+    private BufferedImage[] animationFrames; // player-ani1 to player-ani4
+    private int animationFrameCounter; // Counter to cycle through frames based on speed
+    private int currentAnimationFrame; // Current frame index (0-3)
+    private static final int MAX_ANIMATION_CYCLE_SPEED = 3; // Limit how fast animation frames cycle
+    
+    // Invincibility frame system
+    private int invincibilityFramesRemaining = 0;
+    private static final int INVINCIBILITY_DURATION = 36; // 1.2 seconds at 30 FPS
 
     public Player(int groundY, int screenWidth) {
         this.x = screenWidth / 4;
@@ -107,9 +126,32 @@ public class Player {
         this.playerImage = ImageLoader.loadImage("/player.png");
         this.useImage = (playerImage != null);
         
+        // Load animation frames in reverse order (ani4, ani3, ani2, ani1)
+        this.animationFrames = new BufferedImage[4];
+        for (int i = 0; i < 4; i++) {
+            // Load in reverse: ani4 at index 0, ani3 at index 1, etc.
+            int frameNum = 4 - i;
+            animationFrames[i] = ImageLoader.loadImage("/player-ani" + frameNum + ".png");
+            if (animationFrames[i] != null) {
+                System.out.println("Successfully loaded player-ani" + frameNum + ".png at index " + i);
+            } else {
+                System.err.println("Failed to load player-ani" + frameNum + ".png");
+            }
+        }
+        this.animationFrameCounter = 0;
+        this.currentAnimationFrame = 0;
+        
+        // Initialize boost system
+        this.boostFuel = 0;
+        this.isBoosting = false;
+        this.boostRegenCounter = 0;
+        
         // Initialize wind trail system
         this.windTrails = new ArrayList<>();
         this.windTrailSpawnCounter = 0;
+        
+        // Initialize invincibility system
+        this.invincibilityFramesRemaining = 0;
     }
     
     private void updateLanePosition() {
@@ -152,7 +194,28 @@ public class Player {
         return lane;
     }
 
-    public void update() {
+    public void update(int gameSpeed) {
+        // Decrement invincibility frames
+        if (invincibilityFramesRemaining > 0) {
+            invincibilityFramesRemaining--;
+        }
+        
+        // Update animation frame based on game speed
+        // Faster speeds cycle through frames faster for visual feedback
+        int cycleSpeed = Math.max(1, (gameSpeed / 2)); // Cycle speed relative to game speed
+        // Cap animation cycle speed to prevent excessive frame cycling
+        cycleSpeed = Math.min(cycleSpeed, MAX_ANIMATION_CYCLE_SPEED);
+        animationFrameCounter += cycleSpeed;
+        
+        // Cycle through 4 animation frames
+        // Higher counter values mean faster cycling
+        currentAnimationFrame = (animationFrameCounter / 6) % 4; // 6 is frame duration per image
+        
+        // Prevent counter overflow - reset when it gets too large
+        if (animationFrameCounter > 100000) {
+            animationFrameCounter = 0;
+        }
+        
         // Update wind trails
         windTrailSpawnCounter++;
         
@@ -238,7 +301,8 @@ public class Player {
 
     public void jump() {
         if (!isJumping) {
-            velocityY = -JUMP_STRENGTH;
+            int jumpPower = isBoosting ? BOOST_JUMP_STRENGTH : JUMP_STRENGTH;
+            velocityY = -jumpPower;
             velocityX = 8.0f;  // Horizontal velocity for wider arc
             isJumping = true;
         }
@@ -256,8 +320,23 @@ public class Player {
         int scaledHeight = (int)(height * scale);
         int adjustedX = x + (width - scaledWidth) / 2; // Center the scaled sprite
         
+        // Flash effect when invincible (alternate visibility every 4 frames)
+        if (invincibilityFramesRemaining > 0 && (invincibilityFramesRemaining / 4) % 2 == 0) {
+            // Don't draw player during flash off frames - create flashing effect
+            return;
+        }
+        
         if (useImage && playerImage != null) {
-            g2d.drawImage(playerImage, adjustedX, y, scaledWidth, scaledHeight, null);
+            BufferedImage imageToUse = playerImage;
+            
+            // Use animation frames when not jumping
+            if (!isJumping && animationFrames != null && currentAnimationFrame >= 0 && currentAnimationFrame < animationFrames.length) {
+                if (animationFrames[currentAnimationFrame] != null) {
+                    imageToUse = animationFrames[currentAnimationFrame];
+                }
+            }
+            
+            g2d.drawImage(imageToUse, adjustedX, y, scaledWidth, scaledHeight, null);
         } else {
             g.setColor(new Color(255, 100, 100));
             g.fillRect(adjustedX, y, scaledWidth, scaledHeight);
@@ -288,6 +367,83 @@ public class Player {
         // Clear wind trails on reset
         windTrails.clear();
         windTrailSpawnCounter = 0;
+        
+        // Reset animation
+        animationFrameCounter = 0;
+        currentAnimationFrame = 0;
+        
+        // Reset boost
+        boostFuel = 0;
+        isBoosting = false;
+        boostRegenCounter = 0;
+        
+        // Reset invincibility
+        invincibilityFramesRemaining = 0;
+    }
+    
+    // Boost management methods
+    public void addBoostFuel(int amount) {
+        boostFuel = Math.min(boostFuel + amount, maxBoostFuel);
+        System.out.println("Boost fuel: " + boostFuel + "/" + maxBoostFuel);
+    }
+    
+    public void setBoostActive(boolean active) {
+        if (active && boostFuel > 0) {
+            isBoosting = true;
+        } else {
+            isBoosting = false;
+        }
+    }
+    
+    public void updateBoostFuel() {
+        if (isBoosting && boostFuel > 0) {
+            // Actively boosting - consume fuel
+            boostFuel--;
+            boostRegenCounter = 0; // Reset regen counter while actively boosting
+        } else if (boostFuel <= 0) {
+            // Out of fuel - stop boosting
+            isBoosting = false;
+            boostFuel = 0;
+        }
+        
+        // Regenerate fuel when not boosting and fuel < max
+        if (!isBoosting && boostFuel < maxBoostFuel) {
+            boostRegenCounter++;
+            if (boostRegenCounter >= BOOST_REGEN_RATE) {
+                boostFuel++;
+                System.out.println("Boost regenerated! Fuel: " + boostFuel + "/" + maxBoostFuel);
+                boostRegenCounter = 0;
+            }
+        }
+    }
+    
+    public boolean isBoosting() {
+        return isBoosting;
+    }
+    
+    public int getBoostFuel() {
+        return boostFuel;
+    }
+    
+    public int getMaxBoostFuel() {
+        return maxBoostFuel;
+    }
+    
+    public float getSpeedMultiplier() {
+        return isBoosting ? BOOST_SPEED_MULTIPLIER : 1.0f;
+    }
+    
+    // Invincibility frame methods
+    public void damage() {
+        // Apply invincibility frames when hit by obstacle
+        if (!isInvincible()) {
+            invincibilityFramesRemaining = INVINCIBILITY_DURATION;
+            isBoosting = false; // Lose boost on hit
+        }
+    }
+    
+    public boolean isInvincible() {
+        return invincibilityFramesRemaining > 0;
     }
 
     public int getX() {

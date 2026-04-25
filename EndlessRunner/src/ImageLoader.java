@@ -41,22 +41,29 @@ public class ImageLoader {
                 }
             }
             
-            // Try loading from file system
-            String filePath = path;
-            if (!path.startsWith("/")) {
-                filePath = "resources/" + path;
-            } else {
-                filePath = "resources" + path;
+            // Try loading from file system with multiple possible paths
+            String[] possiblePaths = {
+                "resources" + (path.startsWith("/") ? path : "/" + path),
+                "resources/" + (path.startsWith("/") ? path.substring(1) : path),
+                (path.startsWith("/") ? path.substring(1) : path)
+            };
+            
+            for (String filePath : possiblePaths) {
+                File file = new File(filePath);
+                if (file.exists()) {
+                    image = ImageIO.read(file);
+                    if (image != null && path != null) {
+                        imageCache.put(path, image);
+                        System.out.println("Loaded image from: " + filePath);
+                        return image;
+                    }
+                }
             }
             
-            File file = new File(filePath);
-            if (file.exists()) {
-                image = ImageIO.read(file);
-                if (image != null && path != null) {
-                    imageCache.put(path, image);
-                }
-            } else {
-                System.err.println("Image not found: " + path + " (checked: " + filePath + ")");
+            // If still not found, log error with all attempted paths
+            System.err.println("Image not found: " + path);
+            for (String filePath : possiblePaths) {
+                System.err.println("  Tried: " + new File(filePath).getAbsolutePath());
             }
         } catch (Exception e) {
             System.err.println("Error loading image: " + path);

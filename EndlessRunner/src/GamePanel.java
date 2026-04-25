@@ -17,12 +17,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private static final int GROUND_Y = (int)(HEIGHT * 0.85); // 85% down from top for ground
     private static final int OBSTACLE_SPAWN_RATE = 100; // Frames between obstacle spawns
     private static final int BASE_SPEED = 8;
+    private static final int OBSTACLE_GRACE_DISTANCE = 250; // Minimum distance from player spawn to obstacle spawn
+    private static final int BOOST_SPAWN_RATE = 800; // Frames between boost item spawns (very rare, different from obstacles)
+    private static final int CLOUD_SPAWN_RATE = 120; // Frames between cloud spawns
 
     private Player player;
     private Scoreboard scoreboard;
     private ArrayList<Obstacle> obstacles;
+    private ArrayList<BoostItem> boostItems;
+    private ArrayList<Cloud> clouds;
     private Timer gameTimer;
     private int obstacleSpawnCounter;
+    private int boostSpawnCounter;
+    private int cloudSpawnCounter;
     private int currentSpeed;
     private boolean gameOver;
     private Color skyColor;
@@ -30,7 +37,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private int backgroundOffset = 0;
     private BufferedImage backgroundImage;
     private BufferedImage backgroundNightImage;
+    private BufferedImage roadImage; // Road image instead of drawn road
+    private BufferedImage roadNightImage; // Night version of road
     private boolean useBackgroundImage;
+    private boolean useRoadImage;
     private boolean isPaused = false;
     private Rectangle continueButtonRect; // Pause menu buttons
     private Rectangle mainMenuButtonRect;
@@ -46,7 +56,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         player = new Player(GROUND_Y, WIDTH);
         scoreboard = new Scoreboard();
         obstacles = new ArrayList<>();
+        boostItems = new ArrayList<>();
+        clouds = new ArrayList<>();
         obstacleSpawnCounter = 0;
+        boostSpawnCounter = 300; // Offset so boost spawns at different time than obstacles
+        cloudSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         gameOver = false;
         backgroundOffset = 0;
@@ -57,6 +71,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         backgroundImage = ImageLoader.loadAndScaleBackgroundImage("/background.png", WIDTH, GROUND_Y);
         backgroundNightImage = ImageLoader.loadAndScaleBackgroundImage("/background-night.png", WIDTH, GROUND_Y);
         useBackgroundImage = (backgroundImage != null || backgroundNightImage != null);
+        
+        // Load road images
+        roadImage = ImageLoader.loadAndScaleBackgroundImage("/road.png", WIDTH, HEIGHT - (GROUND_Y - 80));
+        roadNightImage = ImageLoader.loadAndScaleBackgroundImage("/road-night.png", WIDTH, HEIGHT - (GROUND_Y - 80));
+        useRoadImage = (roadImage != null || roadNightImage != null);
 
         gameTimer = new javax.swing.Timer(30, this);
         gameTimer.start();
@@ -93,7 +112,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             }
 
             // Draw road track platform
-            drawDetailedRoad(g, isNightMode);
+            drawRoadImage(g2d, isNightMode);
+
+            // Draw clouds
+            for (Cloud cloud : clouds) {
+                cloud.draw(g2d);
+            }
 
             // Draw by lane for proper depth layering
             // Lane 0 (top/furthest) -> Lane 1 (middle) -> Lane 2 (bottom/closest)
@@ -109,10 +133,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                         obstacle.draw(g);
                     }
                 }
+                
+                // Draw all boost items in this lane
+                for (BoostItem boost : boostItems) {
+                    if (boost.getLane() == lane) {
+                        boost.draw(g);
+                    }
+                }
             }
 
             // Draw scoreboard
             scoreboard.draw(g);
+            
+            // Draw boost fuel bar under lives
+            drawBoostBar(g);
             
             // Draw pause menu if paused
             if (isPaused) {
@@ -147,37 +181,85 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!gameOver && !isPaused) {
-            // Update player
-            player.update();
+            // Update player boost fuel
+            player.updateBoostFuel();
+            
+            // Update player with current game speed for animation
+            player.update((int)(currentSpeed * player.getSpeedMultiplier()));
 
             // Update obstacles
             for (int i = obstacles.size() - 1; i >= 0; i--) {
-                obstacles.get(i).update();
+                obstacles.get(i).update(player.getSpeedMultiplier());
                 if (obstacles.get(i).isOffScreen()) {
                     obstacles.remove(i);
                 }
             }
+            
+            // Update boost items
+            for (int i = boostItems.size() - 1; i >= 0; i--) {
+                boostItems.get(i).update(player.getSpeedMultiplier());
+                if (boostItems.get(i).isOffScreen()) {
+                    boostItems.remove(i);
+                }
+            }
+            
+            // Update clouds (move independently of game speed)
+            for (int i = clouds.size() - 1; i >= 0; i--) {
+                clouds.get(i).update();
+                if (clouds.get(i).isOffScreen(WIDTH)) {
+                    clouds.remove(i);
+                }
+            }
 
-            // Spawn obstacles in random lanes
+            // Spawn obstacles in random lanes with grace distance
             obstacleSpawnCounter++;
             if (obstacleSpawnCounter >= OBSTACLE_SPAWN_RATE) {
                 int randomLane = new Random().nextInt(3);
-                obstacles.add(new Obstacle(WIDTH, GROUND_Y, currentSpeed, randomLane));
+                // Spawn obstacles further right with grace distance applied
+                int spawnX = WIDTH + OBSTACLE_GRACE_DISTANCE;
+                obstacles.add(new Obstacle(spawnX, GROUND_Y, currentSpeed, randomLane));
                 obstacleSpawnCounter = 0;
+            }
+            
+            // Spawn boost items rarely
+            boostSpawnCounter++;
+            if (boostSpawnCounter >= BOOST_SPAWN_RATE) {
+                int randomLane = new Random().nextInt(3);
+                int spawnX = WIDTH + OBSTACLE_GRACE_DISTANCE;
+                boostItems.add(new BoostItem(spawnX, GROUND_Y, currentSpeed, randomLane));
+                boostSpawnCounter = 0;
+            }
+            
+            // Spawn clouds regularly at random y positions
+            cloudSpawnCounter++;
+            if (cloudSpawnCounter >= CLOUD_SPAWN_RATE) {
+                clouds.add(new Cloud(WIDTH, HEIGHT, GROUND_Y));
+                cloudSpawnCounter = 0;
             }
 
             // Check collisions with obstacles (only same lane)
-            for (Obstacle obstacle : obstacles) {
+            for (int i = obstacles.size() - 1; i >= 0; i--) {
+                Obstacle obstacle = obstacles.get(i);
                 if (player.getBounds().intersects(obstacle.getBounds()) && player.getLane() == obstacle.getLane()) {
-                    scoreboard.loseLife();
-                    if (scoreboard.isGameOver()) {
-                        gameOver = true;
-                    } else {
-                        player.reset(GROUND_Y, WIDTH);
-                        scoreboard.resetScore();
-                        obstacles.clear();
+                    // Only take damage if not invincible
+                    if (!player.isInvincible()) {
+                        player.damage();
+                        scoreboard.loseLife();
+                        obstacles.remove(i); // Remove the obstacle that hit us
+                        if (scoreboard.isGameOver()) {
+                            gameOver = true;
+                        }
                     }
                     break;
+                }
+            }
+            
+            // Check collisions with boost items (only same lane)
+            for (int i = boostItems.size() - 1; i >= 0; i--) {
+                BoostItem boost = boostItems.get(i);
+                if (player.getBounds().intersects(boost.getBounds()) && player.getLane() == boost.getLane()) {
+                    player.addBoostFuel(boost.getBoostFuelAmount());
+                    boostItems.remove(i);
                 }
             }
 
@@ -185,7 +267,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             scoreboard.update();
 
             // Update background offset for parallax scrolling
-            backgroundOffset += currentSpeed;
+            backgroundOffset += (int)(currentSpeed * player.getSpeedMultiplier());
             // Keep offset within bounds to prevent overflow
             if (backgroundOffset > 3200) {
                 backgroundOffset -= 3200;
@@ -377,6 +459,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 player.moveUp();
             } else if (e.getKeyCode() == KeyEvent.VK_S) {
                 player.moveDown();
+            } else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                player.setBoostActive(true);
             } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 isPaused = !isPaused;
             } else if (e.getKeyCode() == KeyEvent.VK_Q && isPaused) {
@@ -393,6 +477,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            player.setBoostActive(false);
+        }
     }
 
     @Override
@@ -427,7 +514,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         player.reset(GROUND_Y, WIDTH);
         scoreboard.reset();
         obstacles.clear();
+        boostItems.clear();
+        clouds.clear();
         obstacleSpawnCounter = 0;
+        boostSpawnCounter = 0;
+        cloudSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         backgroundOffset = 0;
         gameOver = false;
@@ -452,6 +543,70 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         // If there's still a gap, draw another copy
         if (bgWidth - offsetX - bgWidth < WIDTH) {
             g2d.drawImage(backgroundImage, 2 * bgWidth - offsetX, 0, bgWidth, bgHeight, null);
+        }
+    }
+    
+    private void drawRoadImage(Graphics2D g2d, boolean isNightMode) {
+        // Use night road image if available during night, otherwise use day road image
+        BufferedImage roadToDraw = isNightMode && roadNightImage != null ? roadNightImage : roadImage;
+        
+        if (roadToDraw != null && useRoadImage) {
+            int roadWidth = roadToDraw.getWidth();
+            int roadHeight = roadToDraw.getHeight();
+            int roadStartY = GROUND_Y - 80;
+            
+            // Draw road image with parallax scrolling
+            int offsetX = backgroundOffset % roadWidth;
+            
+            // Draw the road image and its repeated version for seamless scrolling
+            g2d.drawImage(roadToDraw, -offsetX, roadStartY, roadWidth, roadHeight, null);
+            g2d.drawImage(roadToDraw, roadWidth - offsetX, roadStartY, roadWidth, roadHeight, null);
+            
+            // If there's still a gap, draw another copy
+            if (roadWidth - offsetX - roadWidth < WIDTH) {
+                g2d.drawImage(roadToDraw, 2 * roadWidth - offsetX, roadStartY, roadWidth, roadHeight, null);
+            }
+        } else {
+            // Fallback to drawing the road if no image is available
+            drawDetailedRoad(g2d, isNightMode);
+        }
+    }
+    
+    private void drawBoostBar(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        
+        // Draw boost fuel bar under lives text (top left area)
+        int barX = 20;
+        int barY = 95; // Below lives text
+        int barWidth = 150;
+        int barHeight = 20;
+        
+        // Background
+        g2d.setColor(new Color(50, 50, 50));
+        g2d.fillRect(barX, barY, barWidth, barHeight);
+        
+        // Border
+        g2d.setColor(Color.YELLOW);
+        g2d.setStroke(new BasicStroke(2));
+        g2d.drawRect(barX, barY, barWidth, barHeight);
+        
+        // Fuel bar
+        int fuelWidth = (int)(barWidth * (player.getBoostFuel() / (float)player.getMaxBoostFuel()));
+        if (fuelWidth > 0) {
+            g2d.setColor(new Color(255, 215, 0)); // Gold
+            g2d.fillRect(barX, barY, fuelWidth, barHeight);
+        }
+        
+        // Label
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Arial", Font.PLAIN, 12));
+        g.drawString("Nitro", barX, barY - 5);
+        
+        // Boosting indicator
+        if (player.isBoosting()) {
+            g.setColor(new Color(255, 100, 0)); // Orange
+            g.setFont(new Font("Arial", Font.BOLD, 14));
+            g.drawString("BOOSTING!", barX + barWidth + 20, barY + 15);
         }
     }
     
