@@ -57,6 +57,14 @@ public class Scoreboard {
         return lives;
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
     public void loseLife() {
         lives--;
     }

@@ -29,9 +29,9 @@ public class Obstacle {
 
     public Obstacle(int startX, int groundY, int speed, int lane) {
         this.x = startX;
-        this.width = 140;
-        this.height = 100;
-        this.speed = speed;
+        this.width = 350;   // 2.5x player width (140 * 2.5)
+        this.height = 250;  // 2.5x player height (100 * 2.5)
+        this.speed = (int)(speed * 2.0f);  // 2x speed for more challenge
         this.lane = lane;
         this.obstacleType = new Random().nextInt(2) + 1;
         
@@ -50,12 +50,10 @@ public class Obstacle {
         // Load animation frames for the three truck images
         this.animationFrames = new BufferedImage[3];
         animationFrames[0] = ImageLoader.loadImage("/Truck 1.png");
-        animationFrames[1] = ImageLoader.loadImage("/Truck-2.png");
+        animationFrames[1] = ImageLoader.loadImage("/Truck 2.png");
         animationFrames[2] = ImageLoader.loadImage("/Truck 3.png");
         
-        // Load fallback obstacle image
-        this.obstacleImage = ImageLoader.loadImage("/obstacle.png");
-        this.useImage = (obstacleImage != null);
+        
         
         this.animationFrameCounter = 0;
         this.currentAnimationFrame = 0;
@@ -72,7 +70,7 @@ public class Obstacle {
         animationFrameCounter += cycleSpeed;
         
         // Cycle through 3 animation frames
-        currentAnimationFrame = (animationFrameCounter / 6) % 3; // 6 is frame duration per image
+        currentAnimationFrame = (animationFrameCounter / 12) % 3; // 12 is frame duration per image
         
         // Prevent counter overflow
         if (animationFrameCounter > 100000) {

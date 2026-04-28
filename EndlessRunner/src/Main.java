@@ -17,6 +17,9 @@ public class Main {
         MenuPanel menuPanel = new MenuPanel();
         GamePanel gamePanel = new GamePanel();
         
+        // Pass gamePanel reference to menuPanel
+        menuPanel.setGamePanel(gamePanel);
+        
         // Create main container with CardLayout
         JPanel container = new JPanel(new CardLayout());
         container.add(menuPanel, "Menu");

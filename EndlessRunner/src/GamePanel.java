@@ -44,6 +44,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private boolean isPaused = false;
     private Rectangle continueButtonRect; // Pause menu buttons
     private Rectangle mainMenuButtonRect;
+    private Rectangle save1ButtonRect;
+    private Rectangle save2ButtonRect;
     private boolean returnToMenu = false; // Flag to return to main menu
 
     public GamePanel() {
@@ -94,7 +96,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             if (isNightMode) {
                 // Draw night sky
                 g.setColor(new Color(25, 35, 65));
-                g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+                g.fillRect(0, 0, WIDTH, GROUND_Y + 80);
                 
                 // Draw night background image if available
                 if (backgroundNightImage != null) {
@@ -107,7 +109,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                     drawBackgroundImage(g2d);
                 } else {
                     g.setColor(skyColor);
-                    g.fillRect(0, 0, WIDTH, GROUND_Y - 80);
+                    g.fillRect(0, 0, WIDTH, GROUND_Y + 80);
                 }
             }
 
@@ -492,6 +494,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         if (isPaused && !gameOver) {
             if (continueButtonRect != null && continueButtonRect.contains(e.getPoint())) {
                 isPaused = false;
+            } else if (save1ButtonRect != null && save1ButtonRect.contains(e.getPoint())) {
+                saveGame(1);
+            } else if (save2ButtonRect != null && save2ButtonRect.contains(e.getPoint())) {
+                saveGame(2);
             } else if (mainMenuButtonRect != null && mainMenuButtonRect.contains(e.getPoint())) {
                 returnToMenu = true; // Signal to return to main menu
             }
@@ -532,17 +538,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         
         int bgWidth = backgroundImage.getWidth();
         int bgHeight = backgroundImage.getHeight();
+        int displayHeight = GROUND_Y - 80; // Only show sky portion
         
-        // Draw background image with parallax scrolling
+        // Draw background image with parallax scrolling (same as road)
         int offsetX = backgroundOffset % bgWidth;
         
         // Draw the image and its repeated version for seamless scrolling
-        g2d.drawImage(backgroundImage, -offsetX, 0, bgWidth, bgHeight, null);
-        g2d.drawImage(backgroundImage, bgWidth - offsetX, 0, bgWidth, bgHeight, null);
+        g2d.drawImage(backgroundImage, -offsetX, 0, bgWidth, displayHeight, null);
+        g2d.drawImage(backgroundImage, bgWidth - offsetX, 0, bgWidth, displayHeight, null);
         
         // If there's still a gap, draw another copy
         if (bgWidth - offsetX - bgWidth < WIDTH) {
-            g2d.drawImage(backgroundImage, 2 * bgWidth - offsetX, 0, bgWidth, bgHeight, null);
+            g2d.drawImage(backgroundImage, 2 * bgWidth - offsetX, 0, bgWidth, displayHeight, null);
         }
     }
     
@@ -661,8 +668,44 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         g.setColor(Color.WHITE);
         g.drawString(btnText, btnX, btnY);
         
+        // Draw Save 1 button
+        int save1ButtonY = buttonY + buttonHeight + 20;
+        save1ButtonRect = new Rectangle(buttonX, save1ButtonY, buttonWidth, buttonHeight);
+        
+        g2d.setColor(new Color(100, 100, 150));
+        g2d.fillRect(buttonX, save1ButtonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, save1ButtonY, buttonWidth, buttonHeight);
+        
+        g.setFont(new Font("Arial", Font.BOLD, 28));
+        String save1Text = "SAVE SLOT 1";
+        fm = g.getFontMetrics();
+        btnX = buttonX + (buttonWidth - fm.stringWidth(save1Text)) / 2;
+        btnY = save1ButtonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(save1Text, btnX, btnY);
+        
+        // Draw Save 2 button
+        int save2ButtonY = save1ButtonY + buttonHeight + 20;
+        save2ButtonRect = new Rectangle(buttonX, save2ButtonY, buttonWidth, buttonHeight);
+        
+        g2d.setColor(new Color(100, 100, 150));
+        g2d.fillRect(buttonX, save2ButtonY, buttonWidth, buttonHeight);
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(buttonX, save2ButtonY, buttonWidth, buttonHeight);
+        
+        g.setFont(new Font("Arial", Font.BOLD, 28));
+        String save2Text = "SAVE SLOT 2";
+        fm = g.getFontMetrics();
+        btnX = buttonX + (buttonWidth - fm.stringWidth(save2Text)) / 2;
+        btnY = save2ButtonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
+        g.setColor(Color.WHITE);
+        g.drawString(save2Text, btnX, btnY);
+        
         // Draw Main Menu button
-        int menuButtonY = buttonY + buttonHeight + 20;
+        int menuButtonY = save2ButtonY + buttonHeight + 20;
         mainMenuButtonRect = new Rectangle(buttonX, menuButtonY, buttonWidth, buttonHeight);
         
         // Draw button background
@@ -718,6 +761,40 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         return returnToMenu;
     }
 
+    public void saveGame(int slotNumber) {
+        GameSave save = new GameSave(
+            scoreboard.getScore(),
+            scoreboard.getLives(),
+            player.getLane(),
+            currentSpeed
+        );
+        GameSave.saveToDisk(save, slotNumber);
+        System.out.println("Game saved to slot " + slotNumber);
+    }
+
+    public void loadGame(int slotNumber) {
+        GameSave save = GameSave.loadFromDisk(slotNumber);
+        if (save != null) {
+            // Reset game state first
+            player.reset(GROUND_Y, WIDTH);
+            obstacles.clear();
+            boostItems.clear();
+            clouds.clear();
+            obstacleSpawnCounter = 0;
+            boostSpawnCounter = 300;
+            cloudSpawnCounter = 0;
+            backgroundOffset = 0;
+            gameOver = false;
+            isPaused = false;
+            
+            // Load saved stats
+            scoreboard.setScore(save.score);
+            scoreboard.setLives(save.lives);
+            currentSpeed = save.currentSpeed;
+            System.out.println("Game loaded from slot " + slotNumber);
+        }
+    }
+
     public void resetGameState() {
         returnToMenu = false;
         isPaused = false;
@@ -725,12 +802,17 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         player.reset(GROUND_Y, WIDTH);
         scoreboard.reset();
         obstacles.clear();
+        boostItems.clear();
+        clouds.clear();
         obstacleSpawnCounter = 0;
+        boostSpawnCounter = 300;
+        cloudSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         backgroundOffset = 0;
         skyColor = new Color(135, 206, 235);
         updateSkyColor();
         gameTimer.stop();
+        gameTimer.start();
     }
 }
 
