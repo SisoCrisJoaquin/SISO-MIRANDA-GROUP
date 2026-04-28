@@ -35,6 +35,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private Color skyColor;
     private Color grassColor;
     private int backgroundOffset = 0;
+    private int roadOffset = 0; // Separate offset for road scrolling (full speed)
     private BufferedImage backgroundImage;
     private BufferedImage backgroundNightImage;
     private BufferedImage roadImage; // Road image instead of drawn road
@@ -47,6 +48,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private Rectangle save1ButtonRect;
     private Rectangle save2ButtonRect;
     private boolean returnToMenu = false; // Flag to return to main menu
+    
+    // Death animation state
+    private long deathTime = 0; // When the death occurred (in milliseconds)
+    private static final long YOU_DIED_DISPLAY_TIME = 1000; // Show "You Died" for 1 second before game over info fades in (1 second)
+    private static final long GAME_OVER_FADE_DURATION = 500; // Time to fade in game over text (0.5 seconds)
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -65,6 +71,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         cloudSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         gameOver = false;
+        deathTime = 0;
         backgroundOffset = 0;
         skyColor = new Color(135, 206, 235); // Light blue
         grassColor = new Color(34, 177, 76); // Green
@@ -100,13 +107,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 
                 // Draw night background image if available
                 if (backgroundNightImage != null) {
-                    backgroundImage = backgroundNightImage;
-                    drawBackgroundImage(g2d);
+                    drawBackgroundImage(g2d, backgroundNightImage);
                 }
             } else {
                 // Draw day background
                 if (backgroundImage != null) {
-                    drawBackgroundImage(g2d);
+                    drawBackgroundImage(g2d, backgroundImage);
                 } else {
                     g.setColor(skyColor);
                     g.fillRect(0, 0, WIDTH, GROUND_Y + 80);
@@ -155,28 +161,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 drawPauseMenu(g);
             }
         } else {
-            // Draw game over screen
-            g.setColor(new Color(0, 0, 0, 200));
-            g.fillRect(0, 0, WIDTH, HEIGHT);
-
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 60));
-            FontMetrics fm = g.getFontMetrics();
-            String gameOverText = "GAME OVER";
-            int x = (WIDTH - fm.stringWidth(gameOverText)) / 2;
-            g.drawString(gameOverText, x, 150);
-
-            g.setFont(new Font("Arial", Font.BOLD, 40));
-            String finalScore = "Final Score: " + scoreboard.getScore();
-            fm = g.getFontMetrics();
-            x = (WIDTH - fm.stringWidth(finalScore)) / 2;
-            g.drawString(finalScore, x, 220);
-
-            g.setFont(new Font("Arial", Font.PLAIN, 30));
-            String restartText = "Press 'R' to Restart or 'Q' to Quit";
-            fm = g.getFontMetrics();
-            x = (WIDTH - fm.stringWidth(restartText)) / 2;
-            g.drawString(restartText, x, 350);
+            // Draw game over screen with death animation
+            drawGameOverScreen(g);
         }
     }
 
@@ -250,6 +236,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                         obstacles.remove(i); // Remove the obstacle that hit us
                         if (scoreboard.isGameOver()) {
                             gameOver = true;
+                            deathTime = System.currentTimeMillis(); // Record when death occurred
                         }
                     }
                     break;
@@ -279,6 +266,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             if (backgroundOffset > 3200) {
                 backgroundOffset -= 3200;
             }
+            
+            // Update road offset for full speed scrolling (separate from background)
+            // Road scrolls 10x faster than background, starting at 0.25x speed and ramping to full 1.0x as game progresses
+            float roadSpeedMultiplier = 0.25f + (currentSpeed - BASE_SPEED) * 0.015f; // Ramps from 0.25 to 1.0
+            roadSpeedMultiplier = Math.min(roadSpeedMultiplier, 1.0f); // Cap at 1.0x
+            roadOffset += (int)(currentSpeed * 10.0f * roadSpeedMultiplier);
+            // Keep offset within bounds to prevent overflow
+            if (roadOffset > 10200) {
+                roadOffset -= 10200;
+            }
 
             // Update sky based on score
             updateSkyColor();
@@ -286,11 +283,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             // Increase speed with faster progression (obstacles get faster quicker)
             currentSpeed = BASE_SPEED + (scoreboard.getScore() / 150);
 
-            repaint();
         } else if (!gameOver && isPaused) {
-            // Still repaint when paused to show pause menu
-            repaint();
+            // Still update when paused to show pause menu
         }
+        
+        // Always repaint, whether in gameplay, paused, or game over (for death animation)
+        repaint();
     }
 
     private void drawClouds(Graphics g) {
@@ -423,7 +421,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         }
         Random rand = new Random(12345);
         for (int i = 0; i < 30; i++) {
-            int stoneX = (rand.nextInt(3200) - backgroundOffset) % 3200;
+            int stoneX = (rand.nextInt(3200) - roadOffset) % 3200;
             if (stoneX < 0) stoneX += 3200;
             int stoneY = GROUND_Y - 60 + rand.nextInt(40);
             int size = 3 + rand.nextInt(5);
@@ -439,7 +437,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         Random rand = new Random(12345 + seedOffset / 100);
         
         for (int i = 0; i < 50; i++) {
-            int starX = (rand.nextInt(3200) - backgroundOffset) % 3200;
+            int starX = (rand.nextInt(3200) - (backgroundOffset % 3200)) % 3200;
             if (starX < 0) starX += 3200;
             
             int starY = 20 + rand.nextInt(GROUND_Y - 100);
@@ -538,23 +536,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         repaint();
     }
     
-    private void drawBackgroundImage(Graphics2D g2d) {
-        if (backgroundImage == null) return;
+    private void drawBackgroundImage(Graphics2D g2d, BufferedImage bgImage) {
+        if (bgImage == null) return;
         
-        int bgWidth = backgroundImage.getWidth();
-        int bgHeight = backgroundImage.getHeight();
+        int bgWidth = bgImage.getWidth();
+        int bgHeight = bgImage.getHeight();
         int displayHeight = GROUND_Y - 80; // Only show sky portion
         
-        // Draw background image with parallax scrolling (same as road)
+        // Draw background image with parallax scrolling (slow speed)
         int offsetX = backgroundOffset % bgWidth;
         
         // Draw the image and its repeated version for seamless scrolling
-        g2d.drawImage(backgroundImage, -offsetX, 0, bgWidth, displayHeight, null);
-        g2d.drawImage(backgroundImage, bgWidth - offsetX, 0, bgWidth, displayHeight, null);
+        g2d.drawImage(bgImage, -offsetX, 0, bgWidth, displayHeight, null);
+        g2d.drawImage(bgImage, bgWidth - offsetX, 0, bgWidth, displayHeight, null);
         
         // If there's still a gap, draw another copy
         if (bgWidth - offsetX - bgWidth < WIDTH) {
-            g2d.drawImage(backgroundImage, 2 * bgWidth - offsetX, 0, bgWidth, displayHeight, null);
+            g2d.drawImage(bgImage, 2 * bgWidth - offsetX, 0, bgWidth, displayHeight, null);
         }
     }
     
@@ -567,8 +565,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             int roadHeight = roadToDraw.getHeight();
             int roadStartY = GROUND_Y - 80;
             
-            // Draw road image with parallax scrolling
-            int offsetX = backgroundOffset % roadWidth;
+            // Draw road image with full speed scrolling
+            int offsetX = roadOffset % roadWidth;
             
             // Draw the road image and its repeated version for seamless scrolling
             g2d.drawImage(roadToDraw, -offsetX, roadStartY, roadWidth, roadHeight, null);
@@ -584,41 +582,117 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         }
     }
     
+    private void drawGameOverScreen(Graphics g) {
+        // Full black background
+        g.setColor(new Color(0, 0, 0));
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+        
+        Graphics2D g2d = (Graphics2D) g;
+        
+        // Enable anti-aliasing for smooth text rendering
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        long timeSinceDeath = System.currentTimeMillis() - deathTime;
+        
+        // Always show "YOU DIED" text immediately in red (no fade in)
+        g2d.setColor(new Color(255, 50, 50)); // Bright red
+        g2d.setFont(new Font("Arial", Font.BOLD, 80));
+        FontMetrics fm = g2d.getFontMetrics();
+        String youDiedText = "YOU DIED";
+        int x = (WIDTH - fm.stringWidth(youDiedText)) / 2;
+        int y = HEIGHT / 2;
+        g2d.drawString(youDiedText, x, y);
+        
+        // Phase 2: Fade in game over information after 1 second (1000ms+)
+        if (timeSinceDeath >= YOU_DIED_DISPLAY_TIME) {
+            long timeSinceGameOverStart = timeSinceDeath - YOU_DIED_DISPLAY_TIME;
+            float alpha = Math.min(1.0f, (float) timeSinceGameOverStart / GAME_OVER_FADE_DURATION);
+            
+            // Set alpha composite for fade in effect
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+            
+            // GAME OVER text
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(new Font("Arial", Font.BOLD, 60));
+            fm = g2d.getFontMetrics();
+            String gameOverText = "GAME OVER";
+            x = (WIDTH - fm.stringWidth(gameOverText)) / 2;
+            g2d.drawString(gameOverText, x, 150);
+            
+            // Final Score
+            g2d.setFont(new Font("Arial", Font.BOLD, 40));
+            String finalScore = "Final Score: " + scoreboard.getScore();
+            fm = g2d.getFontMetrics();
+            x = (WIDTH - fm.stringWidth(finalScore)) / 2;
+            g2d.drawString(finalScore, x, 220);
+            
+            // Restart/Quit text
+            g2d.setFont(new Font("Arial", Font.PLAIN, 30));
+            String restartText = "Press 'R' to Restart or 'Q' to Quit";
+            fm = g2d.getFontMetrics();
+            x = (WIDTH - fm.stringWidth(restartText)) / 2;
+            g2d.drawString(restartText, x, 350);
+            
+            // Reset composite
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        }
+    }
+    
     private void drawBoostBar(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         
-        // Draw boost fuel bar under lives text (top left area)
-        int barX = 20;
-        int barY = 95; // Below lives text
-        int barWidth = 150;
-        int barHeight = 20;
+        // Draw boost fuel bar with same aesthetic as Score and Lives
+        int baseX = 30;
+        int baseY = HEIGHT - 40; // Position below Lives and Score
+        int padding = 15;
+        int boxHeight = 70;
+        int boxWidth = 280;
         
-        // Background
+        // Semi-transparent background box (matching Score/Lives style)
+        g2d.setColor(new Color(0, 0, 0, 150));
+        g2d.fillRect(baseX - padding, baseY - padding - boxHeight, boxWidth, boxHeight + padding);
+        
+        // Gold border (matching score bar)
+        g2d.setColor(new Color(255, 215, 0, 200));
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(baseX - padding, baseY - padding - boxHeight, boxWidth, boxHeight + padding);
+        
+        // Nitro label in gold
+        g.setColor(new Color(255, 215, 0));
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("Nitro: ", baseX, baseY - boxHeight + 45);
+        
+        // Calculate fuel percentage for visual bar
+        float fuelPercent = player.getBoostFuel() / (float)player.getMaxBoostFuel();
+        
+        // Draw fuel bar inline with label
+        int fuelBarX = baseX + 140;
+        int fuelBarY = baseY - boxHeight + 25;
+        int fuelBarWidth = 100;
+        int fuelBarHeight = 25;
+        
+        // Background (dark)
         g2d.setColor(new Color(50, 50, 50));
-        g2d.fillRect(barX, barY, barWidth, barHeight);
+        g2d.fillRect(fuelBarX, fuelBarY, fuelBarWidth, fuelBarHeight);
         
-        // Border
-        g2d.setColor(Color.YELLOW);
-        g2d.setStroke(new BasicStroke(2));
-        g2d.drawRect(barX, barY, barWidth, barHeight);
-        
-        // Fuel bar
-        int fuelWidth = (int)(barWidth * (player.getBoostFuel() / (float)player.getMaxBoostFuel()));
+        // Fuel fill (gold)
+        int fuelWidth = (int)(fuelBarWidth * fuelPercent);
         if (fuelWidth > 0) {
-            g2d.setColor(new Color(255, 215, 0)); // Gold
-            g2d.fillRect(barX, barY, fuelWidth, barHeight);
+            g2d.setColor(new Color(255, 215, 0));
+            g2d.fillRect(fuelBarX, fuelBarY, fuelWidth, fuelBarHeight);
         }
         
-        // Label
-        g.setColor(Color.YELLOW);
-        g.setFont(new Font("Arial", Font.PLAIN, 12));
-        g.drawString("Nitro", barX, barY - 5);
+        // Border
+        g2d.setColor(new Color(255, 215, 0));
+        g2d.setStroke(new BasicStroke(2));
+        g2d.drawRect(fuelBarX, fuelBarY, fuelBarWidth, fuelBarHeight);
         
         // Boosting indicator
         if (player.isBoosting()) {
-            g.setColor(new Color(255, 100, 0)); // Orange
-            g.setFont(new Font("Arial", Font.BOLD, 14));
-            g.drawString("BOOSTING!", barX + barWidth + 20, barY + 15);
+            g.setColor(new Color(255, 100, 0));
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("BOOSTING!", baseX, baseY - boxHeight + 70);
         }
     }
     
@@ -801,6 +875,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             boostSpawnCounter = 300;
             cloudSpawnCounter = 0;
             backgroundOffset = 0;
+            roadOffset = 0;
             gameOver = false;
             isPaused = false;
             
@@ -826,6 +901,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         cloudSpawnCounter = 0;
         currentSpeed = BASE_SPEED;
         backgroundOffset = 0;
+        roadOffset = 0;
         skyColor = new Color(135, 206, 235);
         updateSkyColor();
         gameTimer.stop();

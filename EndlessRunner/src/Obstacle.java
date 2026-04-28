@@ -26,11 +26,15 @@ public class Obstacle {
     private int animationFrameCounter; // Counter to cycle through frames
     private int currentAnimationFrame; // Current frame index (0-2)
     private static final int MAX_ANIMATION_CYCLE_SPEED = 3; // Limit how fast animation frames cycle
+    
+    // Progressive speed properties
+    private int frameAge = 0; // Tracks how many frames since obstacle was created
+    private static final int SPEED_RAMP_FRAMES = 30; // Frames to ramp from 0.1x to 1.0x speed
 
     public Obstacle(int startX, int groundY, int speed, int lane) {
         this.x = startX;
-        this.width = 350;   // 2.5x player width (140 * 2.5)
-        this.height = 250;  // 2.5x player height (100 * 2.5)
+        this.width = 300;   // 2.5x player width (140 * 2.5)
+        this.height = 200;  // 2.5x player height (100 * 2.5)
         this.speed = (int)(speed * 2.0f);  // 2x speed for more challenge
         this.lane = lane;
         this.obstacleType = new Random().nextInt(2) + 1;
@@ -64,6 +68,13 @@ public class Obstacle {
     }
     
     public void update(float speedMultiplier) {
+        // Increment frame age to track progression
+        frameAge++;
+        
+        // Calculate progressive multiplier: starts at 0.1x, ramps to 1.0x
+        // Formula: 0.1 + (frameAge / SPEED_RAMP_FRAMES) * 0.9
+        float progressiveMultiplier = Math.min(1.0f, 0.1f + (frameAge / (float)SPEED_RAMP_FRAMES) * 0.9f);
+        
         // Update animation frame based on game speed
         int cycleSpeed = Math.max(1, (int)(speedMultiplier * 2)); // Cycle speed relative to game speed
         cycleSpeed = Math.min(cycleSpeed, MAX_ANIMATION_CYCLE_SPEED);
@@ -77,7 +88,8 @@ public class Obstacle {
             animationFrameCounter = 0;
         }
         
-        x -= (int)(speed * speedMultiplier);
+        // Move obstacle with both speed multiplier and progressive acceleration
+        x -= (int)(speed * speedMultiplier * progressiveMultiplier);
     }
 
     public void draw(Graphics g) {

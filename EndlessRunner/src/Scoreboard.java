@@ -36,17 +36,50 @@ public class Scoreboard {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLACK);
+        Graphics2D g2d = (Graphics2D) g;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int HEIGHT = screenSize.height;
         
-        // Use custom font if available, otherwise fall back to Arial
+        // Larger font for bottom-left display
+        Font largeFont;
         if (customFont != null) {
-            g.setFont(customFont);
+            largeFont = customFont.deriveFont(48f);
         } else {
-            g.setFont(new Font("Arial", Font.BOLD, 24));
+            largeFont = new Font("Arial", Font.BOLD, 48);
         }
         
-        g.drawString("Score: " + score, 20, 30);
-        g.drawString("Lives: " + lives, 20, 60);
+        g.setFont(largeFont);
+        FontMetrics fm = g.getFontMetrics();
+        
+        // Position at bottom-left with padding
+        int baseX = 30;
+        int baseY = HEIGHT - 250; // Start higher to avoid overlapping with nitro bar
+        int padding = 15;
+        int boxHeight = 70;
+        int boxWidth = 280;
+        
+        // Draw semi-transparent background for Lives (on top)
+        g2d.setColor(new Color(0, 0, 0, 150));
+        g2d.fillRect(baseX - padding, baseY - padding, boxWidth, boxHeight);
+        g2d.setColor(new Color(255, 100, 100, 200));
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(baseX - padding, baseY - padding, boxWidth, boxHeight);
+        
+        // Draw Lives text
+        g2d.setColor(new Color(255, 100, 100));
+        g2d.drawString("Lives: " + lives, baseX, baseY + 30);
+        
+        // Draw semi-transparent background for Score (below Lives)
+        baseY += 90;
+        g2d.setColor(new Color(0, 0, 0, 150));
+        g2d.fillRect(baseX - padding, baseY - padding, boxWidth, boxHeight);
+        g2d.setColor(new Color(255, 215, 0, 200));
+        g2d.setStroke(new BasicStroke(3));
+        g2d.drawRect(baseX - padding, baseY - padding, boxWidth, boxHeight);
+        
+        // Draw Score text
+        g2d.setColor(new Color(255, 215, 0));
+        g2d.drawString("Score: " + score, baseX, baseY + 30);
     }
 
     public int getScore() {
