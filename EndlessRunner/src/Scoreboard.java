@@ -94,6 +94,14 @@ public class Scoreboard {
         this.score = score;
     }
 
+    /**
+     * Add points to the current score
+     * @param points The number of points to add
+     */
+    public void addScore(int points) {
+        this.score += points;
+    }
+
     public void setLives(int lives) {
         this.lives = lives;
     }

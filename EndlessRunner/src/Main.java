@@ -39,9 +39,16 @@ public class Main {
         Timer menuTimer = new Timer(50, e -> {
             if (menuPanel.shouldStartGame()) {
                 // Switch to game
+                menuPanel.stopMusic(); // Stop menu music before switching to game
+                try {
+                    Thread.sleep(100); // Give menu music time to fully stop
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 CardLayout layout = (CardLayout) container.getLayout();
                 layout.show(container, "Game");
-                menuPanel.reset();
+                gamePanel.startGameMusic(); // Start game music when entering game
+                menuPanel.reset(); // Reset UI state AFTER music is handled
                 gamePanel.requestFocus();
                 ((Timer) e.getSource()).stop();
                 
@@ -49,10 +56,17 @@ public class Main {
                 Timer gameTimer = new Timer(50, ev -> {
                     if (gamePanel.shouldReturnToMenu()) {
                         // Switch back to menu
+                        gamePanel.stopGameMusic(); // Stop game music before switching to menu
+                        try {
+                            Thread.sleep(100); // Give game music time to fully stop
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
                         CardLayout layout2 = (CardLayout) container.getLayout();
                         layout2.show(container, "Menu");
                         gamePanel.resetGameState();
                         menuPanel.requestFocus();
+                        menuPanel.resumeMusic(); // Resume menu music when returning from game
                         ((Timer) ev.getSource()).stop();
                         menuTimerRef[0].start(); // Restart menu timer
                     }
@@ -62,5 +76,11 @@ public class Main {
         });
         menuTimerRef[0] = menuTimer;
         menuTimer.start();
+        
+        // Shutdown hook to ensure all music is stopped when application closes
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            menuPanel.cleanup();
+            gamePanel.cleanup();
+        }));
     }
 }

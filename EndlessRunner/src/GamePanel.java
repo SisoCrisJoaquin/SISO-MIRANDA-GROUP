@@ -48,6 +48,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
     private Rectangle save1ButtonRect;
     private Rectangle save2ButtonRect;
     private boolean returnToMenu = false; // Flag to return to main menu
+    private MusicPlayer gameMusic; // Background music for gameplay
     
     // Death animation state
     private long deathTime = 0; // When the death occurred (in milliseconds)
@@ -248,6 +249,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 BoostItem boost = boostItems.get(i);
                 if (player.getBounds().intersects(boost.getBounds()) && player.getLane() == boost.getLane()) {
                     player.addBoostFuel(boost.getBoostFuelAmount());
+                    scoreboard.addScore(100); // Award double points for collecting boost
                     boostItems.remove(i);
                 }
             }
@@ -476,6 +478,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
                 restartGame();
             } else if (e.getKeyCode() == KeyEvent.VK_Q) {
                 System.exit(0);
+            } else if (e.getKeyCode() == KeyEvent.VK_M) {
+                returnToMenu = true; // Return to main menu
             }
         }
     }
@@ -627,9 +631,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             x = (WIDTH - fm.stringWidth(finalScore)) / 2;
             g2d.drawString(finalScore, x, 220);
             
-            // Restart/Quit text
+            // Restart/Quit/Menu text
             g2d.setFont(new Font("Arial", Font.PLAIN, 30));
-            String restartText = "Press 'R' to Restart or 'Q' to Quit";
+            String restartText = "Press 'R' to Restart, 'M' for Menu, or 'Q' to Quit";
             fm = g2d.getFontMetrics();
             x = (WIDTH - fm.stringWidth(restartText)) / 2;
             g2d.drawString(restartText, x, 350);
@@ -906,6 +910,36 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         updateSkyColor();
         gameTimer.stop();
         gameTimer.start();
+        stopGameMusic(); // Stop game music when returning to menu
+    }
+
+    /**
+     * Start playing background music for the game
+     */
+    public void startGameMusic() {
+        if (gameMusic == null) {
+            String musicPath = "resources/mondamusic-retro-arcade-game-music-512837.mp3";
+            gameMusic = new MusicPlayer(musicPath);
+        }
+        if (!gameMusic.isPlaying()) {
+            gameMusic.start();
+        }
+    }
+
+    /**
+     * Stop the game background music
+     */
+    public void stopGameMusic() {
+        if (gameMusic != null) {
+            gameMusic.stop();
+        }
+    }
+
+    /**
+     * Cleanup game music resources
+     */
+    public void cleanup() {
+        stopGameMusic();
     }
 }
 
