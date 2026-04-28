@@ -6,7 +6,8 @@ import java.util.Random;
  * ========== CLOUD.JAVA ==========
  * Represents individual clouds that float across the sky
  * Clouds spawn at random y positions in the upper portion of screen
- * Supports 10 different cloud images (cloud1.png through cloud10.png)
+ * Supports 8 different cloud images (cloud1.png, cloud2.png, cloud5-10.png)
+ * Cloud3 and Cloud4 are excluded from the rotation
  * Automatically handles various image sizes up to 400x400 pixels
  * New clouds spawn when old ones go off-screen
  */
@@ -22,8 +23,10 @@ public class Cloud {
     private int cloudVariant; // Track which cloud image we're using
 
     public Cloud(int screenWidth, int screenHeight, int groundY) {
-        // Randomly select one of 10 cloud images
-        this.cloudVariant = new Random().nextInt(10) + 1; // 1-10
+        // Randomly select cloud images, excluding Cloud3 and Cloud4
+        // Valid variants: 1, 2, 5, 6, 7, 8, 9, 10 (8 options)
+        int[] validVariants = {1, 2, 5, 6, 7, 8, 9, 10};
+        this.cloudVariant = validVariants[new Random().nextInt(validVariants.length)];
         
         // Try loading the specific cloud variant first
         String cloudPath = "/cloud" + cloudVariant + ".png";
