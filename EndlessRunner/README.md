@@ -10,15 +10,17 @@ A fun and addictive endless runner game built in pure Java using Swing!
 ✅ **Responsive UI** - Menu and all text scale proportionally to screen size  
 ✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
 ✅ **Pause Menu** - Press P to pause and see your score and lives  
+✅ **Background Music System** - Menu and in-game music with smooth transitions  
 ✅ **Player with 3 Lives** - Lose all lives and it's game over  
 ✅ **Grassy Field Platform** - Run on a beautiful green field  
 ✅ **Spike Obstacles** - Avoid rocks and obstacles to keep running  
 ✅ **Dynamic Scoreboard** - Track your score and remaining lives (top-left corner)  
 ✅ **Collision Detection** - Hit an obstacle? Lose a life and restart  
-✅ **Game Over Screen** - Restart or quit when you run out of lives  
+✅ **Game Over Screen** - Restart, return to menu, or quit when you run out of lives  
 ✅ **Increasing Difficulty** - Game speeds up as your score increases  
 ✅ **Fully Customizable Graphics** - All visual elements use image-based rendering for easy customization  
 ✅ **Background Elements** - Clouds, railings, flags, and trees with parallax scrolling  
+✅ **Boost Items** - Collect boost items for double points (100 points per boost)  
 
 ## How to Play
 
@@ -27,7 +29,9 @@ A fun and addictive endless runner game built in pure Java using Swing!
 - **W** - Move up to top lane (gets smaller for 3D effect)
 - **S** - Move down to bottom lane (gets larger for 3D effect)
 - **ESC** - Pause/Unpause game during gameplay
+- **SHIFT** - Activate boost (doubles player speed temporarily)
 - **R** - Restart game (when game over)
+- **M** - Return to menu (when game over)
 - **Q** - Quit to menu (when paused) or quit game (when game over)
 
 ### Objective
@@ -71,9 +75,10 @@ play.bat
 ## Game Structure
 
 ### Java Source Files
-- **MAIN.JAVA** - Entry point, creates window and manages menu/game switching
-- **MENUPANEL.JAVA** - Main menu screen with game title and controls display
-- **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, and smooth transitions
+- **MAIN.JAVA** - Entry point, creates window and manages menu/game switching, audio lifecycle
+- **MENUPANEL.JAVA** - Main menu screen with game title, controls display, and background music
+- **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, smooth transitions, and game music
+- **MUSICPLAYER.JAVA** - Reusable audio playback system using PowerShell Media Foundation
 - **PLAYER.JAVA** - Player character with jump mechanics and gravity
 - **OBSTACLE.JAVA** - Obstacle spawning and collision detection (image-based)
 - **CLOUD.JAVA** - Cloud background elements with parallax scrolling (image-based)
@@ -84,6 +89,13 @@ play.bat
 - **IMAGELOADER.JAVA** - Custom image loading from resources folder
 
 ## Game Mechanics
+
+### Music System
+- **Menu Background Music** - Loops continuously when on the main menu
+- **Game Background Music** - Plays when in-game, seamlessly transitions from menu music
+- **Audio Management** - Automatically handles music lifecycle (starts/stops when switching between menu and game)
+- **No Audio Window** - All music playback is internal; no separate media player window opens
+- **Smooth Transitions** - Music stops cleanly when switching screens to avoid overlap
 
 ### Player
 - Starts in the middle lane
@@ -105,6 +117,7 @@ play.bat
 
 ### Scoring System
 - Score increases by 1 each frame (30 FPS)
+- **Boost Items** - Collecting a boost item grants 100 bonus points
 - Score resets to 0 when player hits an obstacle
 - Final score displayed when game ends
 - Speed increases with score
@@ -130,6 +143,22 @@ play.bat
 - Shows current score and lives
 - Press P again to resume
 - Press Q to quit and return to main menu
+
+### Game Over Screen
+- Display when all lives are lost
+- Three options:
+  - Press **R** to Restart the game
+  - Press **M** to Return to main menu
+  - Press **Q** to Quit the program
+- Shows final score achieved
+
+### Enhanced Main Menu
+- **Clean Design** - Minimalist layout focused on gameplay
+- **Title Display** - Large "Motorcyclist seeker" title with game description
+- **Interactive Buttons** - Styled START GAME, SAVES, HOW TO PLAY, and EXIT buttons
+- **Controls Display** - Press HOW TO PLAY to view all game controls
+- **Smooth Transitions** - Controls panel expands when clicked without covering exit button
+- **Background Music** - Continuous background music loops while on menu
 
 ## Tips for Playing
 
@@ -185,10 +214,19 @@ See `ASSETS_REMOVED.txt` for detailed technical information about removed hardco
 - Provides better error handling and colored output
 
 ## Recent Updates
-### Version 3.5 - Menu & Pause System
--  Nitro boost: The player can now press Shift to boost themselves
-- added player animation to give the illusion of movement
 
+### Version 4.0 - Audio System & Enhanced Menu (Latest)
+- 🎵 **Background Music System** - Added menu and in-game background music using PowerShell Media Foundation
+- 🎮 **MusicPlayer.java** - New reusable audio system for seamless music transitions
+- 🖼️ **Enhanced Menu UI** - Redesigned menu with shadow effects, rounded buttons, and better visual hierarchy
+- 🔄 **Menu Music Lifecycle** - Music properly starts/stops when transitioning between menu and game
+- ➕ **Boost Item Rewards** - Collecting boost items grants 100 bonus points
+- 🔙 **Return to Menu** - New M key option on game over screen to return to main menu without quitting
+- 📋 **Improved Game Over** - Three distinct options (Restart, Return to Menu, Quit)
+
+### Version 3.5 - Menu & Pause System
+- 🚀 Nitro boost: The player can now press Shift to boost themselves
+- 📝 Added player animation to give the illusion of movement
 
 ### Version 3.0 - Complete Image-Based Refactor ✨
 - 🎨 **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
