@@ -268,8 +268,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
             // Update scoreboard
             scoreboard.update();
 
-            // Update background offset for parallax scrolling
-            backgroundOffset += (int)(currentSpeed * player.getSpeedMultiplier());
+            // Update background offset for parallax scrolling (0.2x to 0.5x speed)
+            float bgSpeedMultiplier = 0.2f + (currentSpeed - BASE_SPEED) * 0.003f; // Ranges from 0.2 to 0.5
+            bgSpeedMultiplier = Math.min(bgSpeedMultiplier, 0.5f); // Cap at 0.5x
+            if (player.isBoosting()) {
+                bgSpeedMultiplier *= 1.1f; // 1.1x when boosting
+            }
+            backgroundOffset += (int)(currentSpeed * bgSpeedMultiplier);
             // Keep offset within bounds to prevent overflow
             if (backgroundOffset > 3200) {
                 backgroundOffset -= 3200;
@@ -686,6 +691,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         g.setColor(Color.WHITE);
         g.drawString(save1Text, btnX, btnY);
         
+        // Draw save1 stats in top right
+        g.setFont(new Font("Arial", Font.PLAIN, 14));
+        String save1Stats = "Score: " + scoreboard.getScore() + " Lives: " + scoreboard.getLives();
+        fm = g.getFontMetrics();
+        g.drawString(save1Stats, buttonX + 10, save1ButtonY + 15);
+        
         // Draw Save 2 button
         int save2ButtonY = save1ButtonY + buttonHeight + 20;
         save2ButtonRect = new Rectangle(buttonX, save2ButtonY, buttonWidth, buttonHeight);
@@ -703,6 +714,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener, Mo
         btnY = save2ButtonY + ((buttonHeight - fm.getAscent()) / 2) + fm.getAscent();
         g.setColor(Color.WHITE);
         g.drawString(save2Text, btnX, btnY);
+        
+        // Draw save2 stats in top right
+        g.setFont(new Font("Arial", Font.PLAIN, 14));
+        String save2Stats = "Score: " + scoreboard.getScore() + " Lives: " + scoreboard.getLives();
+        fm = g.getFontMetrics();
+        g.drawString(save2Stats, buttonX + 10, save2ButtonY + 15);
         
         // Draw Main Menu button
         int menuButtonY = save2ButtonY + buttonHeight + 20;
