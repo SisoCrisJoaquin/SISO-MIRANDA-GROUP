@@ -90,15 +90,15 @@ play.bat
 ## 📸 Screenshots
 
 ### Main Menu
-![Menu Screen - Motorcyclist Seeker](./screenshots/menu-screen.png)
+![Menu Screen - Motorcyclist Seeker](./screenshots/Screenshot%202026-04-29%20132706.png)
 *The main menu featuring the "Motorcyclist Seeker" title with game options*
 
 ### Gameplay
-![Gameplay Screenshot - Endless Runner](./screenshots/gameplay-screen.png)
+![Gameplay Screenshot - Endless Runner](./screenshots/Screenshot%202026-04-29%20134044.png)
 *In-game action showing the player motorcycle on the road with city skyline and score tracker*
 
 ### Game Over
-![Game Over Screen](./screenshots/gameover-screen.png)
+![Game Over Screen](./screenshots/Screenshot%202026-04-29%20134100.png)
 *Game Over screen displaying final score with restart, menu, and quit options*
 
 ---
