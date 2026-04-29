@@ -1,6 +1,12 @@
-# Endless Runner Game - Java
+# Game Title - Motorcyclist Seeker - Endless Runner Game
 
-A fun and addictive endless runner game built in pure Java using Swing!
+## Game Description
+
+**Motorcyclist Seeker** is a high-octane endless runner game where you pilot your motorcycle through an infinite cityscape, dodging obstacles and collecting boost items. Built in pure **Java with Swing**, this game features smooth 3-lane gameplay, day/night transitions, dynamic difficulty scaling, and immersive background music.
+
+Navigate between three lanes, jump over obstacles, and see how far you can run. The faster you go, the more dangerous it gets!
+
+---
 
 ## Features
 
@@ -22,19 +28,42 @@ A fun and addictive endless runner game built in pure Java using Swing!
 ✅ **Background Elements** - Clouds, railings, flags, and trees with parallax scrolling  
 ✅ **Boost Items** - Collect boost items for double points (100 points per boost)  
 
-## How to Play
+---
 
-### Controls
-- **SPACEBAR** - Jump over obstacles / Start game from menu
-- **W** - Move up to top lane (gets smaller for 3D effect)
-- **S** - Move down to bottom lane (gets larger for 3D effect)
-- **ESC** - Pause/Unpause game during gameplay
-- **SHIFT** - Activate boost (doubles player speed temporarily)
-- **R** - Restart game (when game over)
-- **M** - Return to menu (when game over)
-- **Q** - Quit to menu (when paused) or quit game (when game over)
+## 🚀 Quick Start (Setup Instructions)
+ 
+### Windows (Recommended - Batch Scripts)
+```batch
+1. Navigate to EndlessRunner folder
+2. Double-click build.bat      (compiles the game)
+3. Double-click play.bat       (runs the game)
+```
 
-### Objective
+### Command Line (Windows/Linux/Mac)
+```bash
+cd EndlessRunner/src
+javac *.java
+java Main
+```
+
+### Advanced Compilation Options
+```bash
+# Option 1: Compile to bin folder
+cd EndlessRunner
+javac -d bin src/*.java
+java -cp bin Main
+
+# Option 2: Using batch scripts
+cd EndlessRunner
+build.bat
+play.bat
+```
+
+---
+
+## 🎮 How to Play
+
+### Game Objective
 - Run as far as possible without hitting obstacles
 - Dodge obstacles in all 3 lanes (top, middle, bottom)
 - Each frame you survive increases your score by 1
@@ -42,35 +71,37 @@ A fun and addictive endless runner game built in pure Java using Swing!
 - Switch lanes strategically to avoid incoming traffic
 - When score reaches 100, the sky darkens - but the obstacles keep coming!
 
-## Compilation & Running
+### Controls
 
-### ⚡ Quick Start (Recommended - Windows)
-```
-1. Double-click build.bat      (compiles the game)
-2. Double-click play.bat       (runs the game)
-```
-That's it! The game will start immediately.
+| Key | Action |
+|-----|--------|
+| **SPACEBAR** | Jump over obstacles / Start game from menu |
+| **W** | Move up to top lane (gets smaller for 3D effect) |
+| **S** | Move down to bottom lane (gets larger for 3D effect) |
+| **ESC** | Pause/Unpause game during gameplay |
+| **SHIFT** | Activate boost (doubles player speed temporarily) |
+| **R** | Restart game (when game over) |
+| **M** | Return to menu (when game over) |
+| **Q** | Quit to menu (when paused) or quit game (when game over) |
+| **P** | Pause/Resume during gameplay |
 
-### Option 1: From src Folder
-```bash
-cd EndlessRunner/src
-javac *.java
-java Main
-```
+---
 
-### Option 2: From EndlessRunner Folder
-```bash
-cd EndlessRunner
-javac -d bin src/*.java
-java -cp bin Main
-```
+## 📸 Screenshots
 
-### Option 3: Using Batch Scripts
-```bash
-cd EndlessRunner
-build.bat
-play.bat
-```
+### Main Menu
+![Menu Screen - Motorcyclist Seeker](./screenshots/menu-screen.png)
+*The main menu featuring the "Motorcyclist Seeker" title with game options*
+
+### Gameplay
+![Gameplay Screenshot - Endless Runner](./screenshots/gameplay-screen.png)
+*In-game action showing the player motorcycle on the road with city skyline and score tracker*
+
+### Game Over
+![Game Over Screen](./screenshots/gameover-screen.png)
+*Game Over screen displaying final score with restart, menu, and quit options*
+
+---
 
 ## Game Structure
 
@@ -177,10 +208,10 @@ All game graphics are now **image-based** instead of hardcoded! You can easily c
 - **obstacle.png** - Game obstacles fallback (140x100 pixels)
 - **obstacle1.png through obstacle10.png** - 10 randomized obstacle types (140x100 pixels each)
 - **cloud.png** - Sky clouds (60-80 pixels)
-- **railing.png** - Platform railings (80x25 pixels)
-- **flag.png** - Background flags (50x30 pixels)
-- **tree.png** - Day mode trees (50x80 pixels)
-- **tree-night.png** - Night mode trees (50x80 pixels)
+- **railing.png** - Platform railings (80x25 pixels) - no image
+- **flag.png** - Background flags (50x30 pixels) - no image
+- **tree.png** - Day mode trees (50x80 pixels) - no image
+- **tree-night.png** - Night mode trees (50x80 pixels) - no image
 - **background.png** - Day mode background (800x500+ pixels)
 - **background-night.png** - Night mode background (800x500+ pixels)
 
@@ -216,27 +247,27 @@ See `ASSETS_REMOVED.txt` for detailed technical information about removed hardco
 ## Recent Updates
 
 ### Version 4.0 - Audio System & Enhanced Menu (Latest)
-- 🎵 **Background Music System** - Added menu and in-game background music using PowerShell Media Foundation
-- 🎮 **MusicPlayer.java** - New reusable audio system for seamless music transitions
-- 🖼️ **Enhanced Menu UI** - Redesigned menu with shadow effects, rounded buttons, and better visual hierarchy
-- 🔄 **Menu Music Lifecycle** - Music properly starts/stops when transitioning between menu and game
-- ➕ **Boost Item Rewards** - Collecting boost items grants 100 bonus points
-- 🔙 **Return to Menu** - New M key option on game over screen to return to main menu without quitting
-- 📋 **Improved Game Over** - Three distinct options (Restart, Return to Menu, Quit)
+-  **Background Music System** - Added menu and in-game background music using PowerShell Media Foundation
+-  **MusicPlayer.java** - New reusable audio system for seamless music transitions
+-  **Enhanced Menu UI** - Redesigned menu with shadow effects, rounded buttons, and better visual hierarchy
+-  **Menu Music Lifecycle** - Music properly starts/stops when transitioning between menu and game
+-  **Boost Item Rewards** - Collecting boost items grants 100 bonus points
+-  **Return to Menu** - New M key option on game over screen to return to main menu without quitting
+- **Improved Game Over** - Three distinct options (Restart, Return to Menu, Quit)
 
 ### Version 3.5 - Menu & Pause System
 - 🚀 Nitro boost: The player can now press Shift to boost themselves
 - 📝 Added player animation to give the illusion of movement
 
 ### Version 3.0 - Complete Image-Based Refactor ✨
-- 🎨 **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
-- ❌ **Removed Hardcoded Graphics:**
+-  **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
+-  **Removed Hardcoded Graphics:**
   - Obstacle rocks (detailed 3D-style drawings)
   - Cloud formations (fluffy white shapes)
   - Platform railings (geometric lines)
   - Background flags (colored rectangles)
   - Forest trees (polygon-based shapes)
-- 📦 **New Classes:**
+-  **New Classes:**
   - `Cloud.java` - Image-based cloud management
   - `Railing.java` - Image-based railing decoration
   - `Flag.java` - Image-based flag decoration
@@ -269,3 +300,4 @@ See `ASSETS_REMOVED.txt` for detailed technical information about removed hardco
 ---
 
 Enjoy the game! Good luck beating your high score! 🏃‍♂️
+**Game made by Miranda, and siso**
