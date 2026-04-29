@@ -1,296 +1,271 @@
 # SISO-MIRANDA-GROUP - Endless Runner Game
 
-A fun and addictive endless runner game built in pure Java using Swing! Features dynamic day/night transitions, smooth gameplay, and engaging mechanics.
+A fun and addictive endless runner game built in pure Java using Swing!
 
-## 🎮 Features
+## Features
 
 ✅ **Smooth Day/Night Transitions** - Beautiful continuous color blending every 1000 points  
+✅ **3-Lane System** - Switch between top, middle, and bottom lanes with W/S keys for depth perception  
+✅ **Fullscreen Display** - Game automatically scales to your monitor's resolution  
+✅ **Responsive UI** - Menu and all text scale proportionally to screen size  
 ✅ **Main Menu** - Beautiful start screen with instructions before gameplay  
 ✅ **Pause Menu** - Press P to pause and see your score and lives  
+✅ **Background Music System** - Menu and in-game music with smooth transitions  
 ✅ **Player with 3 Lives** - Lose all lives and it's game over  
 ✅ **Grassy Field Platform** - Run on a beautiful green field  
-✅ **Detailed Obstacles** - Avoid rocks and obstacles with realistic 3D effects  
-✅ **Dynamic Scoreboard** - Track your score and remaining lives in real-time  
-✅ **Collision Detection** - Precise collision detection with obstacles  
-✅ **Game Over Screen** - Restart or quit when you run out of lives  
+✅ **Spike Obstacles** - Avoid rocks and obstacles to keep running  
+✅ **Dynamic Scoreboard** - Track your score and remaining lives (top-left corner)  
+✅ **Collision Detection** - Hit an obstacle? Lose a life and restart  
+✅ **Game Over Screen** - Restart, return to menu, or quit when you run out of lives  
 ✅ **Increasing Difficulty** - Game speeds up as your score increases  
-✅ **Custom Graphics Support** - Add your own PNG images for player, obstacles, and backgrounds
-✅ **Parallax Scrolling** - Background elements with depth perception  
-✅ **Seamless Wrapping** - Smooth infinite scrolling backgrounds
+✅ **Fully Customizable Graphics** - All visual elements use image-based rendering for easy customization  
+✅ **Background Elements** - Clouds, railings, flags, and trees with parallax scrolling  
+✅ **Boost Items** - Collect boost items for double points (100 points per boost)  
 
-## 🎮 How to Play
+## How to Play
 
 ### Controls
 - **SPACEBAR** - Jump over obstacles / Start game from menu
-- **P** - Pause/Unpause game during gameplay
+- **W** - Move up to top lane (gets smaller for 3D effect)
+- **S** - Move down to bottom lane (gets larger for 3D effect)
+- **ESC** - Pause/Unpause game during gameplay
+- **SHIFT** - Activate boost (doubles player speed temporarily)
 - **R** - Restart game (when game over)
+- **M** - Return to menu (when game over)
 - **Q** - Quit to menu (when paused) or quit game (when game over)
 
 ### Objective
 - Run as far as possible without hitting obstacles
+- Dodge obstacles in all 3 lanes (top, middle, bottom)
 - Each frame you survive increases your score by 1
 - Avoid obstacles to keep your 3 lives
-- Score reaches different zones every 1000 points with smooth day/night transitions!
+- Switch lanes strategically to avoid incoming traffic
+- When score reaches 100, the sky darkens - but the obstacles keep coming!
 
-### Tips for Playing
-1. **Timing is Key** - Jump early to clear obstacles safely
-2. **Watch the Pattern** - Obstacles spawn at intervals, learn the rhythm
-3. **Stay Centered** - The player automatically moves back to starting position
-4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
-5. **Watch the Sky** - Enjoy the smooth transitions between day and night!
+## Compilation & Running
 
-## 📁 Project Structure
-
+### ⚡ Quick Start (Recommended - Windows)
 ```
-SISO-MIRANDA-GROUP/
-│
-├── README.md                    (Main documentation)
-├── START_HERE.txt              (Quick start guide)
-│
-└── EndlessRunner/              (Game folder)
-    │
-    ├── README.md               (Game-specific docs)
-    ├── build.bat               (Build script - double-click to compile)
-    ├── play.bat                (Play script - double-click to run)
-    ├── build.ps1               (PowerShell build script)
-    │
-    ├── src/                    (Java source code)
-    │   ├── Main.java           (Entry point, window management)
-    │   ├── MenuPanel.java      (Main menu screen)
-    │   ├── GamePanel.java      (Main game loop & rendering)
-    │   ├── Player.java         (Player character & jumping)
-    │   ├── Obstacle.java       (Obstacle spawning & collision)
-    │   ├── Scoreboard.java     (Score & lives tracking)
-    │   └── ImageLoader.java    (Custom image support)
-    │
-    ├── bin/                    (Compiled Java classes)
-    │   └── *.class
-    │
-    └── resources/              (Custom images folder - optional)
-        ├── player.png          (Custom player image)
-        ├── obstacle.png        (Custom obstacle image)
-        └── background.png      (Custom background image)
+1. Double-click build.bat      (compiles the game)
+2. Double-click play.bat       (runs the game)
 ```
+That's it! The game will start immediately.
 
-## ⚡ Quick Play
-
-### 🏃 Just Want to Play? (Fastest!)
-If you already have the game compiled:
-```
-Go to EndlessRunner folder and double-click play.bat
-Game starts immediately!
-```
-
-## ⚡ Quick Start
-
-### Windows (Easiest - First Time Setup)
-```
-1. Go to EndlessRunner folder
-2. Double-click build.bat      (compiles the game)
-3. Double-click play.bat       (runs the game)
-Done! The game will start immediately.
-```
-
-### From Command Line
+### Option 1: From src Folder
 ```bash
-# Option 1: From src folder
 cd EndlessRunner/src
 javac *.java
 java Main
+```
 
-# Option 2: From EndlessRunner folder
+### Option 2: From EndlessRunner Folder
+```bash
 cd EndlessRunner
 javac -d bin src/*.java
 java -cp bin Main
+```
 
-# Option 3: Using batch scripts
+### Option 3: Using Batch Scripts
+```bash
 cd EndlessRunner
 build.bat
 play.bat
 ```
 
-## 🏗️ Game Architecture
+## Game Structure
 
 ### Java Source Files
-- **MAIN.JAVA** - Entry point, creates window and manages menu/game switching
-- **MENUPANEL.JAVA** - Main menu screen with game title and controls display
-- **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, and smooth transitions
+- **MAIN.JAVA** - Entry point, creates window and manages menu/game switching, audio lifecycle
+- **MENUPANEL.JAVA** - Main menu screen with game title, controls display, and background music
+- **GAMEPANEL.JAVA** - Main game loop, rendering, collisions, smooth transitions, and game music
+- **MUSICPLAYER.JAVA** - Reusable audio playback system using PowerShell Media Foundation
 - **PLAYER.JAVA** - Player character with jump mechanics and gravity
-- **OBSTACLE.JAVA** - Obstacle spawning and collision detection
+- **OBSTACLE.JAVA** - Obstacle spawning and collision detection (image-based)
+- **CLOUD.JAVA** - Cloud background elements with parallax scrolling (image-based)
+- **RAILING.JAVA** - Platform railings decoration (image-based)
+- **FLAG.JAVA** - Background flags decoration (image-based)
+- **TREE.JAVA** - Background trees for day/night modes (image-based)
 - **SCOREBOARD.JAVA** - Score tracking and life management system
 - **IMAGELOADER.JAVA** - Custom image loading from resources folder
 
-### Game Mechanics
+## Game Mechanics
 
-#### Player
-- Starts on the left side of the platform
-- Jumps with SPACEBAR
-- Gravity pulls back down to platform
-- Resets position when hitting an obstacle
+### Music System
+- **Menu Background Music** - Loops continuously when on the main menu
+- **Game Background Music** - Plays when in-game, seamlessly transitions from menu music
+- **Audio Management** - Automatically handles music lifecycle (starts/stops when switching between menu and game)
+- **No Audio Window** - All music playback is internal; no separate media player window opens
+- **Smooth Transitions** - Music stops cleanly when switching screens to avoid overlap
 
-#### Obstacles
-- Randomly spawn from right side
+### Player
+- Starts in the middle lane
+- Can jump with SPACEBAR
+- Can switch lanes with W (up) and S (down)
+- Uses 3D perspective scaling:
+  - **Top lane**: Player appears smaller (0.8x scale)
+  - **Middle lane**: Normal size (1.0x scale)
+  - **Bottom lane**: Player appears larger (1.2x scale)
+- Gravity pulls the player back down to the platform
+- Resets to middle lane when hitting an obstacle
+
+### Obstacles
+- Randomly spawn from the right side in all 3 lanes (top, middle, bottom)
+- 10 randomized obstacle types (obstacle1.png through obstacle10.png)
 - Move left at increasing speeds
-- Remove when off-screen
+- Apply the same 3D perspective scaling as the player
+- Removed when they leave the screen
 
-#### Scoring System
+### Scoring System
 - Score increases by 1 each frame (30 FPS)
-- Score resets when hitting obstacle
+- **Boost Items** - Collecting a boost item grants 100 bonus points
+- Score resets to 0 when player hits an obstacle
+- Final score displayed when game ends
 - Speed increases with score
 
-#### Lives System
+### Lives System
 - Player starts with 3 lives
-- Lose 1 life per collision
-- Game over when lives = 0
+- Lose 1 life when hitting an obstacle
+- Game over when lives reach 0
+- Remaining lives shown in top-left scoreboard
 
-#### Day/Night Cycle (Every 1000 Points)
-- **0-400 points**: Full day (light blue sky)
-- **400-600 points**: Smooth day→night transition
-- **600-900 points**: Full night (dark sky with stars)
-- **900-1000 points**: Smooth night→day transition
-- Repeats infinitely
+### Background Transition
+- **Score 0-99**: Clear sunny skies (light blue)
+- **Score 100+**: Gradually darkens to deep blue skies
+- Creates a sense of progressing through time
 
-#### User Interface
-- **Main Menu**: Shows at startup with controls and title
-- **Pause Menu**: Press P to pause, shows score and lives
-- **Game Over Screen**: Shows final score, press R to restart or Q to quit
+### Main Menu
+- Shows on game startup
+- Displays game title and controls
+- Press SPACEBAR to begin playing
 
-## 📝 Build System
+### Pause Menu
+- Press P during gameplay to pause
+- Shows current score and lives
+- Press P again to resume
+- Press Q to quit and return to main menu
+
+### Game Over Screen
+- Display when all lives are lost
+- Three options:
+  - Press **R** to Restart the game
+  - Press **M** to Return to main menu
+  - Press **Q** to Quit the program
+- Shows final score achieved
+
+### Enhanced Main Menu
+- **Clean Design** - Minimalist layout focused on gameplay
+- **Title Display** - Large "Motorcyclist seeker" title with game description
+- **Interactive Buttons** - Styled START GAME, SAVES, HOW TO PLAY, and EXIT buttons
+- **Controls Display** - Press HOW TO PLAY to view all game controls
+- **Smooth Transitions** - Controls panel expands when clicked without covering exit button
+- **Background Music** - Continuous background music loops while on menu
+
+## Tips for Playing
+
+1. **Timing is Key** - Jump early to clear obstacles safely
+2. **Watch the Pattern** - Obstacles spawn at intervals, learn the rhythm
+3. **Stay Centered** - The player automatically moves back to starting position
+4. **Go for Score** - Each frame counts! Higher scores = more challenging gameplay
+5. **Watch the Sky** - When it darkens, you've reached score 100! Keep going!
+
+## Customizing Graphics with Your Own Images
+
+All game graphics are now **image-based** instead of hardcoded! You can easily customize the game appearance by providing PNG images in the `resources/` folder.
+
+### Required Image Files
+- **player.png** - Game player character (140x100 pixels)
+- **obstacle.png** - Game obstacles fallback (140x100 pixels)
+- **obstacle1.png through obstacle10.png** - 10 randomized obstacle types (140x100 pixels each)
+- **cloud.png** - Sky clouds (60-80 pixels)
+- **railing.png** - Platform railings (80x25 pixels)
+- **flag.png** - Background flags (50x30 pixels)
+- **tree.png** - Day mode trees (50x80 pixels)
+- **tree-night.png** - Night mode trees (50x80 pixels)
+- **background.png** - Day mode background (800x500+ pixels)
+- **background-night.png** - Night mode background (800x500+ pixels)
+
+### How to Add Custom Images
+1. Create or source PNG images for the elements you want to customize
+2. Place them in the `resources/` folder
+3. Name them exactly as specified above
+4. Restart the game - your custom images will load automatically!
+
+### Image Tips
+- Use PNG format with transparent backgrounds (alpha channel)
+- If an image is not found, that element simply won't render
+- Check the console output for any image loading errors
+- For best results, use sprites with consistent aspect ratios
+
+See `ASSETS_REMOVED.txt` for detailed technical information about removed hardcoded graphics.
 
 ### Build Scripts (Windows)
 - **build.bat** - Compiles all Java source files to the `bin/` folder
   - Creates necessary directories automatically
   - Shows "Build Complete!" when done
+  - Run this first before playing
   
 - **play.bat** - Launches the game from compiled classes in `bin/` folder
   - Automatically finds and runs the game
+  - Handles all the Java commands for you
   - Just double-click and play!
 
-- **build.ps1** - PowerShell build script with better error handling
+### build.ps1 (PowerShell alternative)
+- Advanced build script for users who prefer PowerShell
+- Provides better error handling and colored output
 
-## 🚀 Recent Updates
+## Recent Updates
 
-### Miranda's Session Updates - Comprehensive Development
+### Version 4.0 - Audio System & Enhanced Menu (Latest)
+- 🎵 **Background Music System** - Added menu and in-game background music using PowerShell Media Foundation
+- 🎮 **MusicPlayer.java** - New reusable audio system for seamless music transitions
+- 🖼️ **Enhanced Menu UI** - Redesigned menu with shadow effects, rounded buttons, and better visual hierarchy
+- 🔄 **Menu Music Lifecycle** - Music properly starts/stops when transitioning between menu and game
+- ➕ **Boost Item Rewards** - Collecting boost items grants 100 bonus points
+- 🔙 **Return to Menu** - New M key option on game over screen to return to main menu without quitting
+- 📋 **Improved Game Over** - Three distinct options (Restart, Return to Menu, Quit)
 
-#### 🎮 Menu System Implementation
-- **MenuPanel.java** - New class created for main menu screen
-  - Displays game title and welcome message
-  - Shows all available controls (SPACEBAR to start, P to pause, Q to quit)
-  - Implements KeyListener for player input detection
-  - SPACEBAR press triggers game start via Main.java
+### Version 3.5 - Menu & Pause System
+- 🚀 Nitro boost: The player can now press Shift to boost themselves
+- 📝 Added player animation to give the illusion of movement
 
-#### ⏸️ Pause Menu with Score Display
-- Added pause functionality via P key during gameplay
-- Pause menu displays:
-  - Current score
-  - Remaining lives
-  - Instructions to resume (P) or quit (Q)
-- Semi-transparent overlay for better visibility
-- Game loop only updates when NOT paused
-
-#### 🌅 Smooth Day/Night Transitions with Color Blending
-- Implemented linear RGB color interpolation algorithm
-  - Formula: `new_value = old_value * (1 - progress) + target_value * progress`
-- Extended transition zones for seamless changes:
-  - **400-600 points**: Day to Night transition zone (200-point blend)
-  - **600-900 points**: Full night mode (stars and trees visible)
-  - **900-1000 points**: Night to Day transition zone (100-point blend)
-- Color updates happen every frame for smooth visual effect
-
-#### 🐛 Bug Fix: Eliminated Abrupt Transitions
-- **Problem**: Day/night environment switched abruptly mid-transition
-- **Root Cause**: `isNightTime()` threshold didn't align with color transition completion
-- **Solution**: 
-  - Changed `isNightTime()` to return true at score >= 550 (after full color blend completes)
-  - Extended transition zones ensure color blending finishes before environment switches
-  - Result: Perfectly smooth transitions with no visual jarring
-
-#### 🔨 Simplified Build System
-- **build.bat** - Created simple compilation script
-  - Automatically creates `bin/` directory
-  - Compiles all `.java` files from `src/` folder
-  - Displays success message when complete
-  - No external jar dependencies needed
-  
-- **play.bat** - Created simple execution script
-  - Runs compiled game from `bin/` folder using `java -cp bin Main`
-  - Just double-click to play!
-  - No complex Java commands needed
-
-- **build.ps1** - PowerShell alternative for advanced users
-  - Enhanced error handling and feedback
-  - Color-coded output for better readability
-  - Cross-platform compatibility
-
-#### 📖 Code Documentation & File Headers
-- Added clear file headers to all Java classes:
-  - `Main.java` - Application entry point and window management
-  - `MenuPanel.java` - Main menu screen and controls
-  - `GamePanel.java` - Core game loop and rendering engine
-  - `Player.java` - Player character with jump mechanics
-  - `Obstacle.java` - Obstacle spawning and collision detection
-  - `Scoreboard.java` - Score and lives tracking
-  - `ImageLoader.java` - Custom image loading with fallback support
-- Each header clearly states file purpose and key features
-
-#### 🎮 Multiple Run Options Verified
-- Tested and confirmed game runs from three different methods:
-  1. **From src folder**: `cd EndlessRunner/src; javac *.java; java Main`
-  2. **From EndlessRunner folder**: `javac -d bin src/*.java; java -cp bin Main`
-  3. **Via batch scripts**: `build.bat` then `play.bat`
-- All methods validated and working perfectly
-
-#### 📚 Documentation Consolidation
-- **Root README.md** - Completely reorganized and expanded
-  - Consolidated with EndlessRunner/README.md content
-  - Added comprehensive project structure with both root and game folders
-  - Included all run options and build methods
-  - Professional formatting with emoji section markers
-  
-- **START_HERE.txt** - Updated with generic file paths
-  - Removed personal machine-specific file paths
-  - Made guide usable for anyone cloning the repository
-  
-- **EndlessRunner/README.md** - Updated with Version 2.2 documentation
-  - Highlighted smooth transition fixes
-  - Added code quality improvements
-  - Documented multiple run options
-
-#### 🏗️ Code Quality Improvements
-- All Java files compile without errors
-- Clear variable naming and comments
-- Organized class hierarchy with proper inheritance
-- Efficient game loop with 30 FPS consistent performance
-- Proper resource management and cleanup
-
----
+### Version 3.0 - Complete Image-Based Refactor ✨
+- 🎨 **Fully Customizable Graphics** - ALL visual elements now use image-based rendering
+- ❌ **Removed Hardcoded Graphics:**
+  - Obstacle rocks (detailed 3D-style drawings)
+  - Cloud formations (fluffy white shapes)
+  - Platform railings (geometric lines)
+  - Background flags (colored rectangles)
+  - Forest trees (polygon-based shapes)
+- 📦 **New Classes:**
+  - `Cloud.java` - Image-based cloud management
+  - `Railing.java` - Image-based railing decoration
+  - `Flag.java` - Image-based flag decoration
+  - `Tree.java` - Image-based tree management (day/night)
+- 🖼️ **Complete Customization Support** - Provide PNG images in resources/ folder
+- 📄 **Documentation** - Updated IMAGES_README.md with new image specifications
+- 🐛 **Code Quality** - Eliminated duplicate hardcoded drawing methods
+- 📋 **Asset Tracking** - Created ASSETS_REMOVED.txt for technical reference
 
 ### Version 2.2 - Bug Fixes & Code Quality
-- 🐛 **Fixed Smooth Transitions**: Eliminated abrupt day/night switching - now perfectly smooth
-  - Extended transition zones (400-600 & 900-1000 point ranges)
-  - Seamless color blending throughout entire cycle
+- 🐛 **Fixed Smooth Transitions**: Eliminated abrupt day/night switching - now perfectly smooth (400-600 & 900-1000 point zones)
 - 📖 **Code Headers**: All Java files now have clear file names and descriptions for easy navigation
 - 🎮 **Multiple Run Options**: Game now runs from both `src/` and `EndlessRunner/` folders
 - ✨ **Better Readability**: Clear file structure with organized class descriptions
 
 ### Version 2.1 - Simplified Build System
-- 🔨 **build.bat**: Simple double-click compilation to `bin/` folder
+- 🔨 **build.bat**: Simple double-click compilation
 - ▶️ **play.bat**: Simple double-click to launch the game
 - 🎨 **Smooth Transitions**: Day/night color transitions instead of abrupt changes
 - ⚡ **Quick Start**: Just 2 clicks to build and play!
 
 ### Version 2.0 - Menu & Pause System
-- ✨ **Main Menu**: Beautiful start screen with game instructions and controls
+- ✨ **Main Menu**: Beautiful start screen with game instructions and controls display
 - ⏸️ **Pause Menu**: Press P to pause and view current score and lives
 - 🎮 **Enhanced UI**: Cleaner game flow with menu-to-game transitions
 - 📋 **MenuPanel.java**: New class for menu rendering and controls
 - 🔄 **Updated Main.java**: Uses CardLayout for smooth menu/game switching
 
-### Version 1.0 - Initial Release
-- Core game mechanics with 3 lives system
-- Score tracking and increasing difficulty
-- Collision detection and game over screen
 
 ---
 
-**Updated by Miranda** 🎮
+Enjoy the game! Good luck beating your high score! 🏃‍♂️
